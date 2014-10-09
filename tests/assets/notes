@@ -1,0 +1,35 @@
+/*
+ * This file is part of: phtar - Mario Aichinger Library
+ * Copyright (C) 2014  Mario Aichinger
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+TODOS TODO todo ToDo todos :
+Posix tar windows paths (change the \ to a / and remove c: )
+Posix split path testing 
+gnu old tar windows paths (change the \ to a / and remove c: )
+failure when calling TarArchiveCreator::create() twice | FIXED
+create an extractor
+
+INFOS:
+http://www.freebsd.org/cgi/man.cgi?query=tar&sektion=5
+http://en.wikipedia.org/wiki/Tar_(computing)
+http://de.wikipedia.org/wiki/Tar
+https://www.gnu.org/software/tar/manual/tar.html#SEC170
+http://www.gnu.org/software/tar/manual/html_section/Formats.html
+https://github.com/libarchive/libarchive/wiki/FormatTar
+https://github.com/libarchive/libarchive/wiki/ManPageTar5
+http://de.wikipedia.org/wiki/Pax_(Unix)
+https://wiki.archlinux.org/index.php/sparse_file#Archiving_with_.60tar.27
