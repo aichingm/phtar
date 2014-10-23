@@ -135,9 +135,9 @@ class MetaBlockAnalyser {
      */
     public static function getTarType($metablock){
         $magic = substr($metablock, 257, 8);
-        if($magic == "ustar  \0"){
+        if($magic === "ustar  \0"){
             return MetaBlockAnalyser::$TYPE_GNU_US_TAR;
-        }elseif($magic == "ustar\0   "){
+        }elseif($magic === "ustar\0"."00"){
             return MetaBlockAnalyser::$TYPE_POSIX_US_TAR;
         }else{
             return MetaBlockAnalyser::$TYPE_GNU_OLD;

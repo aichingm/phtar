@@ -25,13 +25,11 @@ class TarReaderFactory {
     public static function getReader(utils\interfaces\TarArchive $tarArchive) {
         $chunks = $tarArchive->getChunks(); 
         if (count($chunks) > 0) {
-        echo count($chunks)."---";
-            
-            if (utils\MetaBlockAnalyser::getTarType($chunks[0]) == utils\MetaBlockAnalyser::$TYPE_GNU_OLD) {
+            if (utils\MetaBlockAnalyser::getTarType($chunks[0]->getMeta()) == utils\MetaBlockAnalyser::$TYPE_GNU_OLD) {
                 return new GnuOldTar\TarReader($tarArchive);
-            } elseif (utils\MetaBlockAnalyser::getTarType($chunks[0]) == utils\MetaBlockAnalyser::$TYPE_GNU_US_TAR) {
+            } elseif (utils\MetaBlockAnalyser::getTarType($chunks[0]->getMeta()) == utils\MetaBlockAnalyser::$TYPE_GNU_US_TAR) {
                 return new GnuUSTar\TarReader($tarArchive);
-            } elseif (utils\MetaBlockAnalyser::getTarType($chunks[0]) == utils\MetaBlockAnalyser::$TYPE_POSIX_US_TAR) {
+            } elseif (utils\MetaBlockAnalyser::getTarType($chunks[0]->getMeta()) == utils\MetaBlockAnalyser::$TYPE_POSIX_US_TAR) {
                 return new PosixUSTar\TarReader($tarArchive);
             }
         }
