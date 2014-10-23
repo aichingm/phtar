@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of: phtar
  * Copyright (C) 2014  Mario Aichinger
@@ -16,7 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace phtar\GnuUSTar;
+
 /**
  * A class which is able to generate gnu urtar metablocks in the length of 512 
  * characters. Unless this class is designed to generate gnu urtar metablocks it
@@ -34,6 +37,7 @@ class MetaBlock extends \phtar\utils\abstracts\MetaBlock {
         $this->path = $path;
         $this->stringContentBlockFactory = new \phtar\utils\StringContentFactory();
     }
+
     /**
      * Returns a new 512 characters long tar meta block. If the metablock is for
      * example a type '''L''' block the method throws a  HasMoreChunksException 
@@ -60,6 +64,7 @@ class MetaBlock extends \phtar\utils\abstracts\MetaBlock {
         }
         return $metaBlock;
     }
+
     /**
      * Returns an array with the meta an the content block for long filenames (longer the 100 characters).
      * @return array The index 0 conains the metablock as strgin and the index 1 contains the content
@@ -82,6 +87,7 @@ class MetaBlock extends \phtar\utils\abstracts\MetaBlock {
         $this->writeStringToArrayStart($this->prependCharToSize(sprintf('%o', $sum) . "\x00 ", 8, '0'), $struct->checksum);
         return array(0 => $struct . "", 1 => $this->stringContentBlockFactory->create($this->path));
     }
+
     /**
      * Returns a gnu ustar metablock.
      * @param array $inodes An array with all inodes => paths which are already 
@@ -120,6 +126,7 @@ class MetaBlock extends \phtar\utils\abstracts\MetaBlock {
         $this->writeStringToArrayStart($this->prependCharToSize(sprintf('%o', $sum) . "\x00 ", 8, '0'), $struct->checksum);
         return $struct->__toString();
     }
+
     /**
      * Returns the type of the path, for more info checkout the "Summary of tar 
      * type codes" at the end of 

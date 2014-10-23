@@ -33,16 +33,19 @@ use \phtar\utils\interfaces\TarArchive;
  * @copyright (c) 2014, Mario Aichinger
  */
 class TarReader implements \phtar\utils\interfaces\TarReader {
+
     /**
      * Holds an array of TarChunks
      * @var array 
      */
     private $chunks;
+
     /**
      * Holds the current position in the array used for walking through the array.
      * @var int 
      */
     private $pointer = 0;
+
     /**
      * Creates a new TarReader.
      * @param TarArchive $archive
@@ -51,6 +54,7 @@ class TarReader implements \phtar\utils\interfaces\TarReader {
         //save all TarChunks to $this->chuks
         $this->chunks = $archive->getChunks();
     }
+
     /**
      * Returns an array representing an entry in the archive. 
      * array("name" => ...,"type" => ..., "content" => ...) the type is -1 if 
@@ -61,15 +65,15 @@ class TarReader implements \phtar\utils\interfaces\TarReader {
     public function getNextFileOrDirectory() {
         //store the meta data of the current chunk in $meta
         $meta = $this->chunks[$this->pointer]->getMeta();
-       //investigate the typle of the chunk this may varies in other types of 
-       //tar standards or implementations
+        //investigate the typle of the chunk this may varies in other types of 
+        //tar standards or implementations
         $type = MetaBlockAnalyser::getTypeflag($meta);
         //create an empty array which will be returned later
         $array = array();
         switch ($type) {
             //if the $type equals '''0''' or '''\0''' the chunk is a file
             case '0':
-            case '\0':  
+            case '\0':
                 //set the type of the chunk into the array
                 $array['typeflag'] = 0;
                 //set the name of the entry
@@ -87,13 +91,14 @@ class TarReader implements \phtar\utils\interfaces\TarReader {
             default:
                 //create a default array with the type '''-1''' to indecate 
                 //that an error occured
-                $array = array("typeflag"=>"-1", "name"=>"undefind", "content" => "");
+                $array = array("typeflag" => "-1", "name" => "undefind", "content" => "");
         }
         //increase the current position
         $this->pointer++;
         //return the array
         return $array;
     }
+
     /**
      * Returns the content of the TarChunk without the tailing \0
      * @param \phtar\utils\interfaces\TarChunk $tarChunk
@@ -105,6 +110,7 @@ class TarReader implements \phtar\utils\interfaces\TarReader {
         //return a substring of the content form 0 to the length of $sizeDec
         return substr($tarChunk->getRawContent(), 0, $sizeDec);
     }
+
     /**
      * Returns true if the archive has a next entry or false if no not.
      * @return boolean

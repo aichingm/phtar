@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of: phtar
  * Copyright (C) 2014  Mario Aichinger
@@ -16,17 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace phtar\utils\interfaces;
 
+interface TarChunk {
 
-interface TarChunk{
-    
-     public function &getMeta();
+    public function &getMeta();
 
     public function &getRawContent();
 
     public function setMeta($meta);
 
     public function setRawContent($content);
-    
 }

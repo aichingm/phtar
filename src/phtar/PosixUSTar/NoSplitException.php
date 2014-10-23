@@ -27,4 +27,5 @@ namespace phtar\PosixUSTar;
  * @copyright (c) 2014, Mario Aichinger
  */
 class NoSplitException extends \Exception {
+    
 }

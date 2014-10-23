@@ -122,17 +122,17 @@ class MetaBlock extends \phtar\utils\abstracts\MetaBlock {
     }
 
     public function splitPath($path) {
-    if (strlen($path) > 99) {
-        if (strlen($path) < 254 && strpos($path, '/') !== false) {
-            $index = strpos($path, '/', strlen($path) - 99);
-            return array(substr($path, 0, $index), substr($path, $index+1));
+        if (strlen($path) > 99) {
+            if (strlen($path) < 254 && strpos($path, '/') !== false) {
+                $index = strpos($path, '/', strlen($path) - 99);
+                return array(substr($path, 0, $index), substr($path, $index + 1));
+            } else {
+                return array("", substr($path, -99));
+            }
         } else {
-            return array("", substr($path, -99));
+            return array("", $path);
         }
-    } else {
-        return array("", $path);
     }
-}
 
     /**
      * Returns the type of the path, for more info checkout the "Summary of tar 

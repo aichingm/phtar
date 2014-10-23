@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of: phtar
  * Copyright (C) 2014  Mario Aichinger
@@ -19,12 +20,13 @@
 
 namespace phtar\utils\interfaces;
 
+interface TarReader {
 
-interface TarReader{
-public function __construct(TarArchive $archive);
+    public function __construct(TarArchive $archive);
+
     public function reset();
-    public function hasNext();
-    public function getNextFileOrDirectory();
-    
-}
 
+    public function hasNext();
+
+    public function getNextFileOrDirectory();
+}
