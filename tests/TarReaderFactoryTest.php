@@ -14,10 +14,9 @@ class TarReaderFactoryTest extends PHPUnit_Framework_TestCase {
         $a2->loadFromFile("assets/gnuus.tar");
         $a3 = new \phtar\TarArchive();
         $a3->loadFromFile("assets/posixustar.tar");
-var_dump(count($a3->getChunks()));
-        //$this->assertInstanceOf("\phtar\GnuOldTar\TarReader", \phtar\TarReaderFactory::getReader(new \phtar\TarArchive($a1)));
-        //$this->assertInstanceOf("\phtar\GnuUSTar\TarReader", \phtar\TarReaderFactory::getReader(new \phtar\TarArchive($a2)));
-        $this->assertInstanceOf("\phtar\PosixUSTar\TarReader", \phtar\TarReaderFactory::getReader(new \phtar\TarArchive($a3)));
+        $this->assertInstanceOf("\phtar\GnuOldTar\TarReader", \phtar\TarReaderFactory::getReader($a1));
+        $this->assertInstanceOf("\phtar\GnuUSTar\TarReader", \phtar\TarReaderFactory::getReader($a2));
+        $this->assertInstanceOf("\phtar\PosixUSTar\TarReader", \phtar\TarReaderFactory::getReader($a3));
     }
 
 }
