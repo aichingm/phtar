@@ -47,12 +47,6 @@ class TarArchiveCreator implements utils\interfaces\TarArchiveCreator {
     private $files = array();
 
     /**
-     * Holds an array of all directories wich sould be added to the archive
-     * @var array 
-     */
-    private $directories = array();
-
-    /**
      * Holds an array of all chunks which should be added to the atchive.
      * @var array 
      */
@@ -126,11 +120,6 @@ class TarArchiveCreator implements utils\interfaces\TarArchiveCreator {
      */
     public function &create() {
         $tarArchive = new TarArchive();
-        foreach ($this->directories as $dir) {
-            foreach ($this->chunkFactory->create($dir) as $chunk) {
-                $tarArchive->addChunk($chunk);
-            }
-        }
         foreach ($this->files as $file) {
             foreach ($this->chunkFactory->create($file) as $chunk) {
                 $tarArchive->addChunk($chunk);
