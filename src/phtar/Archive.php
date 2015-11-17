@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../Autoload.php';
+
 class ArchiveV7 implements Iterator {
 
     private $handle;
@@ -61,8 +63,11 @@ class ArchiveV7 implements Iterator {
     protected function getType() {
         fseek($this->handle, $this->filePointer + 156);
         $type = fgetc($this->handle);
+        $name = $this->getName();
+        var_dump($name{strlen($name) - 1});
         switch ($type) {
             case '0':
+            case ' ':
             case "\0":
                 return "file";
             case '1':
@@ -126,7 +131,7 @@ class ArchiveV7 implements Iterator {
 
     protected function getName() {
         fseek($this->handle, $this->filePointer + 0);
-        return fread($this->handle, 100);
+        return strstr(fread($this->handle, 100), "\0", true); #this is a good hack replace substr(..., strpos(..., ...))
     }
 
     protected function getLinkname() {
@@ -140,7 +145,7 @@ class ArchiveV7 implements Iterator {
     }
 
     /*
-     * 
+     * Iterator
      */
 
     public function current() {
@@ -161,7 +166,7 @@ class ArchiveV7 implements Iterator {
             "type" => $type,
             "checksum" => $this->getChecksum(),
             "valid_header" => $this->validateChecksum(),
-            "content" => new VirtualFileCursor($this->handle, $fileOffset, $size)
+            "content" => new \phtar\utils\VirtualFileCursor($this->handle, $fileOffset, $size)
         );
     }
 
@@ -197,78 +202,13 @@ class ArchiveV7 implements Iterator {
 
 }
 
-class VirtualFileCursor implements Countable {
-
-    private $handle;
-    private $offset = 0;
-    private $fileStart = 0;
-    private $fileEnd = 0;
-
-    function __construct($handle, $fileOffset, $length) {
-        $this->handle = $handle;
-        if (!is_resource($this->handle)) {
-            $this->handle = null;
-        }
-        $this->fileStart = $fileOffset;
-        if ($this->fileStart < 1) {
-            $this->fileStart = 0;
-        }
-        $this->fileEnd = $this->fileStart + $length;
-        if ($this->fileEnd < 1) {
-            $this->fileEnd = 0;
-        }
-    }
-
-    public function read($length) {
-        $end = $this->offset + $length;
-        if ($end < $this->length() && $end > 0) {
-            return fread($this->handle, $length);
-        }
-        return false;
-    }
-
-    public function seek($offset, $whence = SEEK_SET) {
-        if ($whence == SEEK_SET) {
-            $newOffset = $this->fileStart + $offset;
-            if ($newOffset >= $this->fileStart && $newOffset < $this->fileEnd) {
-                $this->offset = $offset;
-                return fseek($this->handle, $this->fileStart + $offset, SEEK_SET);
-            } else {
-                return null;
-            }
-        } else if ($whence == SEEK_CUR) {
-            $newOffset = $this->fileStart + $this->offset + $offset;
-            if ($newOffset >= $this->fileStart && $newOffset < $this->fileEnd) {
-                $this->offset += $offset;
-                return fseek($this->handle, $offset, SEEK_CUR);
-            } else {
-                return "false";
-            }
-        }
-        return false;
-    }
-
-    public function char() {
-        return fgetc($this->handle);
-    }
-
-    public function count($mode = 'COUNT_NORMAL') {
-        return $this->length();
-    }
-
-    public function length() {
-        return $this->fileEnd - $this->fileStart;
-    }
-
-}
-
 $a = new ArchiveV7();
 $a->loadFile($argv[1]);
 $a->buildIndex();
 foreach ($a as $key => $value) {
     $value["content"]->seek(0);
-    if (strpos($key, "XYZ") !== false) {
-        var_dump($key, $value, $value["content"]->read(100));
-    }
+    # if (strpos($key, "XYZ") !== false) {
+    var_dump($key, $value, $value["content"]->read(100));
+    #}
 }
 
