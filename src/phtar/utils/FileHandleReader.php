@@ -9,12 +9,12 @@ namespace phtar\utils;
  */
 class FileHandleReader implements \phtar\utils\ReadFileFunctions {
 
-    private $handle;
+    protected $handle;
     private $closeFd = false;
 
     function __construct($handle) {
         if (!is_resource($handle)) {
-            throw new UnexpectedValueException("expecting a resource");
+            throw new \UnexpectedValueException("expecting a resource");
         }
         $this->handle = $handle;
     }

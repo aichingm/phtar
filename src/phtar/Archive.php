@@ -1,14 +1,14 @@
 <?php
-
 require_once __DIR__ . '/../Autoload.php';
 
 
 
 
 
-$a = new phtar\v7\Archive(new \phtar\utils\FileHandleReader(fopen($argv[1], "r+")));
+$a = new phtar\posixUs\Archive(new \phtar\utils\FileHandleReader(fopen($argv[1], "r+")));
 $a->buildIndex();
 $c = [];
+var_dump($a->validate());
 foreach ($a as $key => $value) {
     //$c[] = clone $value;
     //$value->setRaw(true);

@@ -10,7 +10,6 @@ namespace phtar\utils;
 class FileHandleHelper {
 
     public static function CLONE_HANDLE($fd, $initSeek = -1) {
-        var_dump("got called");
         if (!is_resource($fd)) {
             throw new \UnexpectedValueException("not a resource");
         }
@@ -31,7 +30,7 @@ class FileHandleHelper {
     public static function COPY_H2H(ReadFileFunctions $from, WriteFileFunctions $to, $bufferSize = 8) {
         $from->seek(0);
         $bytesWriten = 0;
-        while (!$this->eof()) {
+        while (!$from->eof()) {
             $bytesWriten += $to->write($from->read($bufferSize));
         }
         return $bytesWriten;

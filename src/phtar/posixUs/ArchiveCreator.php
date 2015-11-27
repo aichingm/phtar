@@ -9,7 +9,7 @@
  * test with bsdtar, tar, star, ark
  */
 
-namespace phtar\v7;
+namespace phtar\posixUs;
 
 class ArchiveCreator implements \Countable {
 
@@ -49,6 +49,13 @@ class ArchiveCreator implements \Countable {
             $this->writeEmptyChecksum($entry);
             $this->writeType($entry);
             $this->writeLinkname($entry);
+            $this->writeMagic();
+            $this->writeVersion();
+            $this->writeUserName($entry);
+            $this->writeGroupName($entry);
+            $this->writeDevMajor($entry);
+            $this->writeDevMinor($entry);
+            $this->writePrefix();
             $this->writePadding($entry);
             $this->writeChecksum();
             $this->writeContent($entry);
@@ -103,17 +110,8 @@ class ArchiveCreator implements \Countable {
     }
 
     protected function writeType(Entry $entry) {
-        switch ($entry->getType()) {
-            case Archive::ENTRY_TYPE_HARDLINK:
-                $type = 1;
-                break;
-            case Archive::ENTRY_TYPE_FILE:
-            default :
-                $type = "\0";
-                break;
-        }
         $this->seek(156);
-        $this->handle->write($type);
+        $this->handle->write(strval($entry->getType()));
     }
 
     protected function writeLinkname(Entry $entry) {
@@ -122,9 +120,49 @@ class ArchiveCreator implements \Countable {
         $this->handle->write($linkname);
     }
 
-    protected function writePadding() {
-        $padding = str_repeat("\0", 255);
+    protected function writeMagic() {
         $this->seek(257);
+        $this->handle->write("ustar\0");
+    }
+
+    protected function writeVersion() {
+        $this->seek(263);
+        $this->handle->write("00");
+    }
+
+    protected function writeUserName(Entry $entry) {
+        $username = str_pad($entry->getUserName(), 32, "\0", STR_PAD_RIGHT);
+        $this->seek(265);
+        $this->handle->write($username);
+    }
+
+    protected function writeGroupName(Entry $entry) {
+        $groupname = str_pad($entry->getGroupName(), 32, "\0", STR_PAD_RIGHT);
+        $this->seek(297);
+        $this->handle->write($groupname);
+    }
+
+    protected function writeDevMajor(Entry $entry) {
+        $devMajor = str_pad($entry->getDevMajor()." \0", 8, "0", STR_PAD_LEFT);
+        $this->seek(329);
+        $this->handle->write($devMajor);
+    }
+
+    protected function writeDevMinor(Entry $entry) {
+        $devMinor = str_pad($entry->getDevMinor()." \0", 8, "0", STR_PAD_LEFT);
+        $this->seek(337);
+        $this->handle->write($devMinor);
+    }
+
+    protected function writePrefix() {
+        $prefix = str_pad($prefix, 155, "\0", STR_PAD_RIGHT);
+        $this->seek(345);
+        $this->handle->write($prefix);
+    }
+
+    protected function writePadding() {
+        $padding = str_repeat("\0", 12);
+        $this->seek(500);
         $this->handle->write($padding);
     }
 

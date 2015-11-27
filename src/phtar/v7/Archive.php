@@ -1,5 +1,7 @@
 <?php
+
 namespace phtar\v7;
+
 class Archive implements \Iterator {
 
     const ENTRY_TYPE_FILE = 0;
@@ -7,15 +9,15 @@ class Archive implements \Iterator {
     const ENTRY_TYPE_HARDLINK = 2;
     const ENTRY_TYPE_SOFTLINK = 3;
 
-    private $handle;
-    private $index = array();
-    private $indexBuilt = false;
-    private $pointer = 0;
-    private $filePointer = 0;
-    private $headerHandlePrototype;
-    private $contentHandlePrototype;
+    protected $handle;
+    protected $index = array();
+    protected $indexBuilt = false;
+    protected $pointer = 0;
+    protected $filePointer = 0;
+    protected $headerHandlePrototype;
+    protected $contentHandlePrototype;
 
-    function __construct(\phtar\utils\FileHandleReader $handle) {
+    public function __construct(\phtar\utils\FileHandleReader $handle) {
         #$this->headerHandlePrototype = new phtar\utils\VirtualFileCursor(clone $handle, 0, 0);
         $this->headerHandlePrototype = new \phtar\utils\StringCursor("");
         $this->contentHandlePrototype = new \phtar\utils\VirtualFileCursor(clone $handle, 0, 0);
@@ -23,11 +25,21 @@ class Archive implements \Iterator {
     }
 
     public function validate() {
-        
-    }
-
-    public function search($filename) {
-        
+        $filePointer = $this->filePointer;
+        $violations = array();
+        $this->filePointer = 0;
+        while ($this->valid()) {
+            if(!$this->validateChecksum()){
+                $violations[] = $this->getName();
+            }
+            $this->next();
+        }
+        $this->filePointer = $filePointer;
+        if(count($violations) > 0){
+            return $violations;
+        }else{
+            return true;
+        }
     }
 
     public function buildIndex() {
@@ -135,7 +147,7 @@ class Archive implements \Iterator {
         $this->headerHandlePrototype->setString($this->seekRead($this->filePointer, 512));
         $this->contentHandlePrototype->setBoundaries($fileOffset, $size);
 
-        return new Entry($this->headerHandlePrototype, $this->contentHandlePrototype);
+        return new ArchiveEntry($this->headerHandlePrototype, $this->contentHandlePrototype);
     }
 
     public function key() {
@@ -170,5 +182,3 @@ class Archive implements \Iterator {
     }
 
 }
-
-

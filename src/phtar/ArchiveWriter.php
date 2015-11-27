@@ -2,24 +2,12 @@
 
 require_once __DIR__ . '/../Autoload.php';
 
+#$c = new \phtar\v7\ArchiveCreator(new phtar\utils\FileHandle(fopen($argv[1], "r+")));
+$c = new \phtar\posixUs\ArchiveCreator(new phtar\utils\FileHandle(fopen($argv[1], "r+")));
 
+$c->add(new \phtar\posixUs\LinuxFsEntry("src/Autoload.php"));
+#$c->add(new \phtar\v7\LinuxFsEntry("src/phtar/".basename(__FILE__)));
+#$c->add(new \phtar\v7\LinuxFsEntry("src/phtar/v7"));
+#$c->add(new \phtar\v7\BaseEntry("src/phtar/test/file.txt", "this is a test!"));
 
-
-
-$a = new phtar\v7\Archive(new \phtar\utils\FileHandleReader(fopen($argv[1], "r+")));
-$a->buildIndex();
-$c = [];
-foreach ($a as $key => $value) {
-    //$c[] = clone $value;
-    //$value->setRaw(true);
-    #if (strpos($key, "XYZ") !== false) {
-    var_dump($key, $value, phtar\utils\ArchiveType::entryType($value->getHeaderHandle()), $value->getMode(), $value->getGroupId());
-    #}
-    #$value->seek(0);
-    var_dump($value->getMode(), $value->read(512));
-}
-#var_dump($c);
-#$f = fopen($argv[1], "r");
-#var_dump(ftell($f));
-#var_dump(fgetc($f));
-#var_dump(ftell($f));
+$c->write();

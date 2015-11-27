@@ -2,7 +2,7 @@
 
 namespace phtar\v7;
 
-interface Entry extends \phtar\utils\ReadFileFunctions {
+interface Entry {
 
     public function getName();
 
@@ -16,13 +16,9 @@ interface Entry extends \phtar\utils\ReadFileFunctions {
 
     public function getMTime();
 
-    public function getChecksum();
-
     public function getType();
 
     public function getLinkname();
-
-    public function getContent();
 
     public function copy2handle(\phtar\utils\WriteFileFunctions $destHandle, $bufferSize = 8);
 }
