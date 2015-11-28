@@ -36,7 +36,7 @@ class ArchiveCreator implements \Countable {
         foreach ($this->entries as $entry) {
             $size = $entry->getSize();
             $this->currFileEnd = $this->currFileStart + 512;
-            if ($size >= 0) {
+            if ($size > 0) {
                 $nullBytes = 512 - ( $size % 512 );
                 $this->currFileEnd += $nullBytes + $size;
             }
@@ -55,7 +55,7 @@ class ArchiveCreator implements \Countable {
             $this->writeGroupName($entry);
             $this->writeDevMajor($entry);
             $this->writeDevMinor($entry);
-            $this->writePrefix();
+            $this->writePrefix($entry);
             $this->writePadding($entry);
             $this->writeChecksum();
             $this->writeContent($entry);
@@ -143,19 +143,19 @@ class ArchiveCreator implements \Countable {
     }
 
     protected function writeDevMajor(Entry $entry) {
-        $devMajor = str_pad($entry->getDevMajor()." \0", 8, "0", STR_PAD_LEFT);
+        $devMajor = str_pad($entry->getDevMajor() . " \0", 8, "0", STR_PAD_LEFT);
         $this->seek(329);
         $this->handle->write($devMajor);
     }
 
     protected function writeDevMinor(Entry $entry) {
-        $devMinor = str_pad($entry->getDevMinor()." \0", 8, "0", STR_PAD_LEFT);
+        $devMinor = str_pad($entry->getDevMinor() . " \0", 8, "0", STR_PAD_LEFT);
         $this->seek(337);
         $this->handle->write($devMinor);
     }
 
-    protected function writePrefix() {
-        $prefix = str_pad($prefix, 155, "\0", STR_PAD_RIGHT);
+    protected function writePrefix(Entry $entry) {
+        $prefix = str_pad($entry->getPrefix(), 155, "\0", STR_PAD_RIGHT);
         $this->seek(345);
         $this->handle->write($prefix);
     }
@@ -187,9 +187,10 @@ class ArchiveCreator implements \Countable {
     protected function writeContent(Entry $entry) {
         $this->seek(512);
         $size = $entry->copy2handle($this->handle);
-
-        $nullBytes = 512 - ($size % 512);
-        $this->handle->write(str_repeat("\0", $nullBytes));
+        if ($size > 0) {
+            $nullBytes = 512 - ($size % 512);
+            $this->handle->write(str_repeat("\0", $nullBytes));
+        }
     }
 
     protected function writeFinalBlocks() {

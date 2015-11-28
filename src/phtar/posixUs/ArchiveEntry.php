@@ -20,23 +20,15 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
      */
     public function getType() {
         $this->handle->seek(156);
-        $type = $this->handle->getc();
+        $type = intval($this->handle->getc(), 10);
         $name = $this->getName();
         if ($name{strlen($name) - 1} === "/") {
-            $type = '5';
+            $type = 5;
         }
-        switch ($type) {
-            case '0':
-            case "\0":
-                return self::ENTRY_TYPE_FILE;
-            case '1':
-                return self::ENTRY_TYPE_HARDLINK;
-            case '2':
-                return self::ENTRY_TYPE_SOFTLINK;
-            case '5':
-                return self::ENTRY_TYPE_DIRECTORY;
-            default:
-                throw new UnexpectedValueException("A valid type was expected");
+        if ($type > -1 && $type < 7) {
+            return strval($type);
+        } else {
+            throw new UnexpectedValueException("A valid type was expected");
         }
     }
 
@@ -51,8 +43,6 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
     }
 
     public function getGroupName() {
-        #return posix_getpwuid($this->getUserId())['name'];
-        #return posix_getgrgid($this->getGroupId())['name'];
         $this->seek(297);
         return strstr($this->handle->read(32), "\0", true);
     }

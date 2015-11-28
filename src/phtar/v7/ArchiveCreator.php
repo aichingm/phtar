@@ -36,7 +36,7 @@ class ArchiveCreator implements \Countable {
         foreach ($this->entries as $entry) {
             $size = $entry->getSize();
             $this->currFileEnd = $this->currFileStart + 512;
-            if ($size >= 0) {
+            if ($size > 0) {
                 $nullBytes = 512 - ( $size % 512 );
                 $this->currFileEnd += $nullBytes + $size;
             }
@@ -149,9 +149,10 @@ class ArchiveCreator implements \Countable {
     protected function writeContent(Entry $entry) {
         $this->seek(512);
         $size = $entry->copy2handle($this->handle);
-
-        $nullBytes = 512 - ($size % 512);
-        $this->handle->write(str_repeat("\0", $nullBytes));
+        if ($size > 0) {
+            $nullBytes = 512 - ($size % 512);
+            $this->handle->write(str_repeat("\0", $nullBytes));
+        }
     }
 
     protected function writeFinalBlocks() {

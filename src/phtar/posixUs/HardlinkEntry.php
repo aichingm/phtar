@@ -1,6 +1,6 @@
 <?php
 
-namespace phtar\v7;
+namespace phtar\posixUs;
 
 /**
  * Description of LinuxFileEntry
@@ -50,6 +50,26 @@ class HardlinkEntry implements Entry {
 
     public function getUserId() {
         return $this->entry->getUserId();
+    }
+
+    public function getDevMajor() {
+        return $this->entry->getDevMajor();
+    }
+
+    public function getDevMinor() {
+        return $this->entry->getDevMinor();
+    }
+
+    public function getGroupName() {
+        return $this->entry->getGroupName();
+    }
+
+    public function getPrefix() {
+        return $this->entry->getPrefix();
+    }
+
+    public function getUserName() {
+        return $this->entry->getUserName();
     }
 
 }

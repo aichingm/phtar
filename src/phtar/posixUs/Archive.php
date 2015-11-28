@@ -32,7 +32,7 @@ class Archive extends \phtar\v7\Archive {
             $type = 5;
         }
         if ($type > -1 && $type < 7) {
-            return $type;
+            return strval($type);
         } else {
             throw new UnexpectedValueException("A valid type was expected");
         }

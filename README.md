@@ -21,3 +21,17 @@ Info and Links:
 * https://github.com/libarchive/libarchive/wiki/ManPageTar5
 * http://de.wikipedia.org/wiki/Pax_(Unix)
 * https://wiki.archlinux.org/index.php/sparse_file#Archiving_with_.60tar.27
+
+Devmajor & Devminor
+-------------------
+
+* http://www.makelinux.net/ldd3/chp-3-sect-2
+
+Version 2
+=========
+
+Todo
+----
+
+* char device support in the posixUs format
+* block device support in the posixUs format

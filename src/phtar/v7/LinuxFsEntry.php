@@ -4,7 +4,7 @@
 namespace phtar\v7;
 
 /**
- * Description of LinuxFileEntry
+ * Description of LinuxFsEntry
  *
  * @author mario
  */
@@ -21,7 +21,7 @@ class LinuxFsEntry implements Entry {
         if (is_dir($filename) && $filename{strlen($filename) - 1} != "/") {
             $filename .= "/";
         }
-        $inode = fileinode($this->filename);
+        $inode = fileinode($filename);
         if (!isset(self::$USED_NODES[$inode])) {
             self::$USED_NODES[$inode] = $filename;
         }
@@ -76,7 +76,7 @@ class LinuxFsEntry implements Entry {
 
     public function getType() {
         $inode = fileinode($this->filename);
-        return isset(self::$USED_NODES[$inode]) && self::$USED_NODES[$inode] != $this->filename ? "0" : "1";
+        return isset(self::$USED_NODES[$inode]) && self::$USED_NODES[$inode] == $this->filename ? "0" : "1";
     }
 
     public function getUserId() {
