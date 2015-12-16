@@ -4,12 +4,17 @@ namespace phtar\posixUs;
 
 class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
 
-    public function getName() {
+    public function getRealName() {
         $this->handle->seek(0);
         $name = strstr($this->handle->read(100), "\0", true);
         $this->handle->seek(345);
         $prefix = strstr($this->handle->read(155), "\0", true);
         return $name . $prefix;
+    }
+
+    public function getName() {
+        $this->handle->seek(0);
+        return strstr($this->handle->read(100), "\0", true);
     }
 
     /**

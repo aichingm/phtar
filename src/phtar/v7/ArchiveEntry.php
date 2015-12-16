@@ -4,8 +4,8 @@ namespace phtar\v7;
 
 class ArchiveEntry implements Entry {
 
-    private $handle;
-    private $contentHandle;
+    protected $handle;
+    protected $contentHandle;
 
     function __construct(\phtar\utils\ReadFileFunctions $handle, \phtar\utils\ReadFileFunctions $contentHandle) {
         $this->handle = $handle;
@@ -60,17 +60,17 @@ class ArchiveEntry implements Entry {
             $type = '5';
         }
         switch ($type) {
-            case '0':
-            case "\0":
-                return self::ENTRY_TYPE_FILE;
+
             case '1':
                 return self::ENTRY_TYPE_HARDLINK;
             case '2':
                 return self::ENTRY_TYPE_SOFTLINK;
             case '5':
                 return self::ENTRY_TYPE_DIRECTORY;
+            case '0':
+            case "\0":
             default:
-                throw new UnexpectedValueException("A valid type was expected");
+                return self::ENTRY_TYPE_FILE;
         }
     }
 

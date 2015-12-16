@@ -137,7 +137,7 @@ class Archive implements \Iterator {
         $size = $this->getSize();
         $type = $this->getType();
         $fileOffset = $this->filePointer + 512;
-        if ($type == self::ENTRY_TYPE_HARDLINK || $type == self::ENTRY_TYPE_SOFTLINK) {
+        if ($type == self::ENTRY_TYPE_HARDLINK) {
             $fileOffset = $this->index[$this->getLinkname()];
             //read size diffrent record
             $size = intval($this->seekRead($fileOffset + 124, 12), 8);

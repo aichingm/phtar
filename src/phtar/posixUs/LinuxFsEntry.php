@@ -29,6 +29,10 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         return $name;
     }
 
+    public function getRealName() {
+        return $this->filename;
+    }
+
     public function getDevMajor() {
         if ($this->getType() == Archive::ENTRY_TYPE_BLOCK_DEV_NODE || $this->getType() === Archive::ENTRY_TYPE_CHAR_DEV_NODE) {
             return self::MAJOR_MINOR($this->filename)[0];

@@ -10,6 +10,8 @@ namespace phtar\posixUs;
 class BaseEntry extends PrimitiveEntry {
 
     public function __construct($name, $content) {
+        $this->setRealName($name);
+
         $names = PrimitiveEntry::splitName($name);
         $this->setPrefix($names[0])->setName($names[1])->setContent($content);
 
@@ -22,9 +24,6 @@ class BaseEntry extends PrimitiveEntry {
         $this->setSize(strlen($this->getContent()));
         $this->setType("0");
         $this->setDevMajor(0)->setDevMinor(0);
-        
-        
-        
     }
 
 }

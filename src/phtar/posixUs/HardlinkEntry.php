@@ -39,6 +39,9 @@ class HardlinkEntry implements Entry {
     public function getName() {
         $this->getName();
     }
+    public function getRealName() {
+        return $this->entry->getRealName();
+    }
 
     public function getSize() {
         return 0;

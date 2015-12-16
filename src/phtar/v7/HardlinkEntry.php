@@ -25,21 +25,21 @@ class HardlinkEntry implements Entry {
     }
 
     public function getLinkname() {
-        $this->entry->getName();
+        return $this->entry->getName();
     }
 
     public function getMTime() {
-        $this->entry->getMTime();
+        return $this->entry->getMTime();
     }
 
     public function getMode() {
-        $this->entry->getMode();
+        return $this->entry->getMode();
     }
 
     public function getName() {
-        $this->getName();
+        return $this->name;
     }
-
+ 
     public function getSize() {
         return 0;
     }

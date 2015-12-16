@@ -10,6 +10,7 @@ namespace phtar\posixUs;
 class DirEntry extends PrimitiveEntry {
 
     public function __construct($name) {
+        $this->setRealName($name);
         $names = PrimitiveEntry::splitName($name);
         $this->setPrefix($names[0])->setName($names[1])->setContent("");
 

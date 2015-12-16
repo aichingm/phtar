@@ -97,5 +97,6 @@ class PrimitiveEntry implements Entry {
         $this->userId = $userId;
         return $this;
     }
+    
 
 }

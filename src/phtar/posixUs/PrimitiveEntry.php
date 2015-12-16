@@ -9,10 +9,19 @@ namespace phtar\posixUs;
  */
 class PrimitiveEntry extends \phtar\v7\PrimitiveEntry implements Entry {
 
-    private $userName, $groupName, $devMajor, $devMinor, $prefix;
+    private $userName, $groupName, $devMajor, $devMinor, $prefix, $realName;
 
     public function getUserName() {
         return $this->userName;
+    }
+
+    public function getRealName() {
+        return $this->realName;
+    }
+
+    public function setRealName($realName) {
+        $this->realName = $realName;
+        return $this;
     }
 
     public function getGroupName() {

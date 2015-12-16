@@ -1,6 +1,5 @@
 <?php
 
-
 namespace phtar\v7;
 
 /**
@@ -17,7 +16,7 @@ class LinuxFsEntry implements Entry {
         if ((!is_file($filename) && !is_dir($filename)) || !is_readable($filename)) {
             throw new \UnexpectedValueException("readable file expected");
         }
-        
+
         if (is_dir($filename) && $filename{strlen($filename) - 1} != "/") {
             $filename .= "/";
         }
