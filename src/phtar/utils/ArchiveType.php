@@ -13,16 +13,18 @@ class ArchiveType {
     public static function entryType(\phtar\utils\ReadFileFunctions $tarEntry) {
         $tarEntry->seek(257);
         $magicVersion = $tarEntry->read(8);
-        if ($magicVersion === "ustar  " . "\0" . "  ") {
+        var_dump($magicVersion);
+        if ($magicVersion === "ustar  \0") {
             return self::TYPE_GNU;
         } elseif ($magicVersion === "ustar" . "\0" . "00") {
             return self::TYPE_POSIX_USTAR;
-        } else if (
-                $magicVersion === "\0\0\0\0\0\0\0\0" &&
-                $tarEntry->seek(257) === 0 &&
-                self::onlyContains($tarEntry->read(255), "\0")
-        ) {
-            return self::TYPE_V7;
+        } else if ($magicVersion === "\0\0\0\0\0\0\0\0") {
+            $tarEntry->seek(257);
+            if (self::onlyContains($tarEntry->read(255), "\0")) {
+                return self::TYPE_V7;
+            } else {
+                return self::TYPE_V7_GTAR;
+            }
         }
     }
 

@@ -155,7 +155,7 @@ class ArchiveCreator implements \Countable {
 
     protected function writeMagic() {
         $this->seek(257);
-        $this->handle->write("ustar \0");
+        $this->handle->write("ustar ");
     }
 
     protected function writeVersion() {

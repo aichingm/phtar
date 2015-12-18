@@ -21,14 +21,14 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
 
     public function getDevMajor() {
         if ($this->getType() == Archive::ENTRY_TYPE_BLOCK_DEV_NODE || $this->getType() === Archive::ENTRY_TYPE_CHAR_DEV_NODE) {
-            return self::MAJOR_MINOR($this->filename)[0];
+            return \phtar\utils\LinuxFileHelper::MAJOR_MINOR($this->filename)[0];
         }
         return 0;
     }
 
     public function getDevMinor() {
         if ($this->getType() == Archive::ENTRY_TYPE_BLOCK_DEV_NODE || $this->getType() === Archive::ENTRY_TYPE_CHAR_DEV_NODE) {
-            return self::MAJOR_MINOR($this->filename)[1];
+            return \phtar\utils\LinuxFileHelper::MAJOR_MINOR($this->filename)[1];
         }
         return 0;
     }
@@ -75,18 +75,6 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
             $this->type = $this->investigateType();
         }
         return $this->type;
-    }
-
-    public static function MAJOR_MINOR($filename) {
-        if (is_executable("/usr/bin/ls")) {
-            $line = exec("/usr/bin/ls -l " . escapeshellarg($filename));
-        } else if (is_executable("/bin/ls")) {
-            $line = exec("/bin/ls -l " . escapeshellarg($filename));
-        } else {
-            throw new \Exception("Unable to execute the ls command. Are you on unix?");
-        }
-        $parts = explode(" ", $line);
-        return array(intval($parts[4]{0}), intval($parts[5]{0}));
     }
 
     public function getATime() {
