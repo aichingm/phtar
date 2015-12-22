@@ -27,7 +27,7 @@ class FileHandleHelper {
         return $clone_fd;
     }
 
-    public static function COPY_H2H(ReadFileFunctions $from, WriteFileFunctions $to, $bufferSize = 8) {
+    public static function COPY_H2H(ReadFileFunctions $from, WriteFileFunctions $to, $bufferSize = 512) {
         $from->seek(0);
         $bytesWriten = 0;
         while (!$from->eof()) {

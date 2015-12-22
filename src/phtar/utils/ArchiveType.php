@@ -28,14 +28,8 @@ class ArchiveType {
         }
     }
 
-    private static function onlyContains($str, $char) {
-        $size = strlen($str);
-        for ($i = 0; $i < $size; $i++) {
-            if ($str{$i} !== $char) {
-                return false;
-            }
-        }
-        return true;
+    public static function onlyContains($str, $char) {
+        $strInfo = count_chars($str, 3);
+        return strlen($strInfo) == 1 && $strInfo == $char;
     }
-
-}
+}   

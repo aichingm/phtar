@@ -11,6 +11,10 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
 
     protected $handle;
     private $closeFd = false;
+    const EOF_MODE_EOF = 0;
+    const EOF_MODE_LENGTH = 1;
+    const EOF_MODE_TRY_READ = 2;
+    
 
     function __construct($handle) {
         if (!is_resource($handle)) {
@@ -19,8 +23,21 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
         $this->handle = $handle;
     }
 
-    public function eof() {
-        return feof($this->handle);
+    public function eof($mode = 0) {
+        switch ($mode) {
+            case 1:
+                return ftell($this->handle) >= $this->length();
+            case 2:
+                if (fgetc($this->handle) === false) {
+                    return true;
+                } else {
+                    $this->seek(-1, SEEK_CUR);
+                    return false;
+                }
+            case 0:
+            default :
+                return feof($this->handle);
+        }     
     }
 
     public function getc() {
@@ -28,10 +45,17 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
     }
 
     public function gets($length = null) {
-        return fgets($this->handle, $length);
+        if ($length) {
+            return fgets($this->handle, $length);
+        } else {
+            return fgets($this->handle);
+        }
     }
 
-    public function length() {
+    public function length($safe = true) {
+        if ($safe) {
+            clearstatcache();
+        }
         return fstat($this->handle)['size'];
     }
 
