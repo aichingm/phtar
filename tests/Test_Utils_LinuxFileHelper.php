@@ -17,8 +17,10 @@ $t->test("Tests /dev/tty0", function() use($t, $databox) {
 });
 
 $t->test("Tests /dev/sr0", function() use($t, $databox) {
-    $t->assertEquals(LinuxFileHelper::MAJOR_MINOR("/dev/sr0")[0], 11, "Major");
-    $t->assertEquals(LinuxFileHelper::MAJOR_MINOR("/dev/sr0")[1], 0, "Minor");
+    #$file = "/dev/sr0";
+    $file = "/dev/sda";
+    $t->assertEquals(LinuxFileHelper::MAJOR_MINOR($file)[0], 8, "Major");
+    $t->assertEquals(LinuxFileHelper::MAJOR_MINOR($file)[1], 0, "Minor");
 });
 
 $t->run();
