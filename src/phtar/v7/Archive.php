@@ -29,15 +29,15 @@ class Archive implements \Iterator {
         $violations = array();
         $this->filePointer = 0;
         while ($this->valid()) {
-            if(!$this->validateChecksum()){
+            if (!$this->validateChecksum()) {
                 $violations[] = $this->getName();
             }
             $this->next();
         }
         $this->filePointer = $filePointer;
-        if(count($violations) > 0){
+        if (count($violations) > 0) {
             return $violations;
-        }else{
+        } else {
             return true;
         }
     }
@@ -92,7 +92,7 @@ class Archive implements \Iterator {
             case '5':
                 return self::ENTRY_TYPE_DIRECTORY;
             default:
-                throw new UnexpectedValueException("A valid type was expected");
+                throw new \UnexpectedValueException("A valid type was expected");
         }
     }
 
@@ -127,13 +127,31 @@ class Archive implements \Iterator {
     }
 
     /*
+     * find functions
+     */
+
+    public function find($name) {
+        if (!$this->indexBuilt) {
+            $this->buildIndex();
+        }
+        if (!isset($this->index[$name])) {
+            return null;
+        }
+        $oldFilepointer = $this->filePointer;
+        $this->filePointer = $this->index[$name];
+        $this->current();
+        $this->filePointer = $oldFilepointer;
+        return new ArchiveEntry(clone $this->headerHandlePrototype, clone $this->contentHandlePrototype);
+    }
+
+    /*
      * Iterator functions
      */
 
     public function current() {
-
-        $this->index[$this->getName()] = $this->filePointer;
-
+        if (!$this->indexBuilt) {
+            $this->index[$this->getName()] = $this->filePointer;
+        }
         $size = $this->getSize();
         $type = $this->getType();
         $fileOffset = $this->filePointer + 512;
@@ -159,8 +177,16 @@ class Archive implements \Iterator {
         if ($size == 0) {
             $this->filePointer += 512;
         } else {
-            $this->filePointer += 512 - $size % 512 + $size;
+            //skip the header
             $this->filePointer += 512;
+            //add the size
+            $this->filePointer += $size;
+            //calc the padding
+            $pad = 512 - ($size % 512);
+            //if the padding NOT is 512 add it
+            if ($pad != 512) {
+                $this->filePointer += $pad;
+            }
         }
         ++$this->pointer;
     }

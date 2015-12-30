@@ -13,7 +13,6 @@ class ArchiveType {
     public static function entryType(\phtar\utils\ReadFileFunctions $tarEntry) {
         $tarEntry->seek(257);
         $magicVersion = $tarEntry->read(8);
-        var_dump($magicVersion);
         if ($magicVersion === "ustar  \0") {
             return self::TYPE_GNU;
         } elseif ($magicVersion === "ustar" . "\0" . "00") {

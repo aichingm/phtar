@@ -7,15 +7,23 @@ class StringCursor implements ReadFileFunctions {
     private $str;
     private $size;
     private $offset = 0;
+    private $eofTried = false;
 
+    const EOF_MODE_EOF = 0;
+    const EOF_MODE_LENGTH = 1;
+    const EOF_MODE_TRY_READ = 2;
 
     function __construct($string) {
-       $this->setString($string);
+        $this->setString($string);
     }
 
     public function read($length) {
         $end = $this->offset + $length;
-        if ($end < $this->size && $end > 0) {
+        if ($end > 0) {
+            if($end > $this->size){
+                $length = $this->size - $this->offset;
+                $this->eofTried = true;
+            }
             $string = substr($this->str, $this->offset, $length);
             $this->offset += $length;
             return $string;
@@ -24,6 +32,7 @@ class StringCursor implements ReadFileFunctions {
     }
 
     public function seek($offset, $whence = SEEK_SET) {
+        $this->eofTried = false;
         if ($whence == SEEK_SET) {
             if ($offset >= 0 && $offset < $this->size) {
                 $this->offset = $offset;
@@ -47,26 +56,48 @@ class StringCursor implements ReadFileFunctions {
         return $this->size;
     }
 
-    public function eof() {
-        return !($this->offset < $this->size);
+    public function eof($mode = 0) {
+        switch ($mode) {
+            case self::EOF_MODE_LENGTH:
+                return !($this->offset < $this->size);
+            case self::EOF_MODE_TRY_READ:
+                if ($this->getc() === false) {
+                    return true;
+                } else {
+                    $this->seek(-1, SEEK_CUR);
+                    return false;
+                }
+            case 0:
+            default :
+                return $this->eofTried;
+        }
     }
 
     public function getc() {
-        return $this->str{$this->offset++};
+        if (isset($this->str{$this->offset})) {
+            return $this->str{$this->offset++};
+        } else {
+            $this->eofTried = true;
+            return false;
+        }
     }
 
     public function gets($length = null) {
-        
-        $nlPos = strpos("\n", $this->str, $this->offset);
-        if($length == null || $nlPos < $length){
-            $length = $nlPos;
+        $nlPos = strpos($this->str, "\n", $this->offset) + 1;
+        if($nlPos === false){
+            $nlPos = $this->size - $this->offset;
+        }
+        if ($length == null || $nlPos < $length) {
+            $length = $nlPos - $this->offset;
         }
         return $this->read($length);
     }
-    public function setString($string){
+
+    public function setString($string) {
         $this->str = $string;
         $this->size = strlen($string);
         $this->offset = 0;
+        $this->eofTried = false;
     }
 
 }

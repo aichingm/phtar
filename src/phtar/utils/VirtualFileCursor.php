@@ -8,6 +8,11 @@ class VirtualFileCursor implements ReadFileFunctions {
     private $offset = 0;
     private $fileStart = 0;
     private $fileEnd = 0;
+    private $eofTried = false;
+
+    const EOF_MODE_EOF = 0;
+    const EOF_MODE_LENGTH = 1;
+    const EOF_MODE_TRY_READ = 2;
 
     #private $rawMode = false;
 
@@ -16,20 +21,16 @@ class VirtualFileCursor implements ReadFileFunctions {
         $this->setBoundaries($fileOffset, $length);
     }
 
-    /* public function setRaw($mode) {
-      if ($this->rawMode == false && $mode) {
-      $this->fileStart -= 512;
-      $this->rawMode = true;
-      } else if ($this->rawMode == true && !$mode) {
-      $this->fileStart += 512;
-      $this->rawMode = false;
-      }
-      } */
-
     public function read($length) {
         $end = $this->offset + $length;
-        if ($end < $this->length() && $end > 0) {
-            return $this->handle->read($length);
+        if ($end > 0) {
+            if ($end > $this->length()) {
+                $length = $this->length() - $this->offset;
+                $this->eofTried = true;
+            }
+            $string = $this->handle->read($length);
+            $this->offset += $length;
+            return $string;
         }
         return false;
     }
@@ -59,16 +60,42 @@ class VirtualFileCursor implements ReadFileFunctions {
         return $this->fileEnd - $this->fileStart;
     }
 
-    public function eof() {
-        return !($this->offset < $this->fileEnd);
+    public function eof($mode = 0) {
+        switch ($mode) {
+            case self::EOF_MODE_LENGTH:
+                return !($this->fileStart + $this->offset < $this->fileEnd);
+            case self::EOF_MODE_TRY_READ:
+                if ($this->getc() === false) {
+                    return true;
+                } else {
+                    $this->seek(-1, SEEK_CUR);
+                    return false;
+                }
+            case 0:
+            default :
+                return $this->eofTried;
+        }
     }
 
     public function getc() {
-        return $this->handle->getc();
+        if ($this->fileStart + $this->offset < $this->fileEnd) {
+            $this->offset++;
+            return $this->handle->getc();
+        } else {
+            $this->eofTried = true;
+            return false;
+        }
     }
 
     public function gets($length = null) {
-        return $this->handle->gets($length);
+        $string = $this->handle->gets($length);
+        if (strlen($string) + $this->offset > $this->fileEnd) {
+            $string = substr($string, 0, $this->fileEnd - $this->offset);
+            $this->offset = $this->fileEnd;
+        } else {
+            $this->offset += strlen($string);
+        }
+        return $string;
     }
 
     public function setBoundaries($offset, $length) {
@@ -81,6 +108,10 @@ class VirtualFileCursor implements ReadFileFunctions {
             $this->fileEnd = 0;
         }
         $this->seek(0);
+    }
+
+    public function __clone() {
+        $this->handle = clone $this->handle;
     }
 
 }

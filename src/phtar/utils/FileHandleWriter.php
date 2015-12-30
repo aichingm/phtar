@@ -16,6 +16,7 @@ namespace phtar\utils;
 class FileHandleWriter implements WriteFileFunctions {
 
     protected $handle;
+    private $closeFd = false;
 
     public function __construct($handle) {
         if (!is_resource($handle)) {
@@ -37,6 +38,17 @@ class FileHandleWriter implements WriteFileFunctions {
 
     public function flush() {
         return fflush($this->handle);
+    }
+
+    public function __clone() {
+        $this->handle = FileHandleHelper::CLONE_HANDLE($this->handle);
+        $this->closeFd = true;
+    }
+
+    public function __destruct() {
+        if ($this->closeFd) {
+            fclose($this->handle);
+        }
     }
 
 }
