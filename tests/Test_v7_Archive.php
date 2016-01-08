@@ -5,7 +5,7 @@ $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
 
 
-$t->test('Test phtar\v7\Archive', function() use($t, $databox) {
+$t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $databox) {
     $cwd = getcwd();
     chdir(sys_get_temp_dir());
     require __DIR__ . '/assets/setup.env.v7.php';
@@ -55,10 +55,29 @@ $t->test('Test phtar\v7\Archive', function() use($t, $databox) {
     }
     $t->assertEmpty($filelist);
     
+    fclose($fHandle);
+    unlink($filename);
+    Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+});
+
+
+$t->test('Test if the phtar\v7\Archive contains correct files and directories', function() use($t, $databox) {
+    $cwd = getcwd();
+    chdir(sys_get_temp_dir());
+    require __DIR__ . '/assets/setup.env.v7.php';
+    $filename = tempnam(sys_get_temp_dir(), 'Tar');
+    exec("bsdtar --format=v7 -cvf  $filename " . ENV_NAME);
+    chdir($cwd);
+    $fHandle = fopen($filename, "r");
+    $handle = new \phtar\utils\FileHandle($fHandle);
+
+
+    $archive = new \phtar\v7\Archive($handle);
+    
     $x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
     $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
     $t->assertEquals($x->getSize(), 0);
-    $t->assertEquals($x->getMTime(), strtotime("1992.06.23 14:12"));
+    $t->assertEquals($x->getMTime(), strtotime("1992:06:23 14:12:00"));
     $t->assertEquals($x->getMode(), 0755);
     $t->assertEquals($x->getUserId(), posix_getuid());
     $t->assertEquals($x->getGroupId(), posix_getgid());
@@ -70,15 +89,13 @@ $t->test('Test phtar\v7\Archive', function() use($t, $databox) {
     $t->assertTrue($x->validateChecksum());
     $t->assertEquals($x->getContent(), "");
     $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
-    $t->assertEquals($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime());
-    
-    
+    $t->assertEquals($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime()); 
     
     $dir1 = $archive->find("env.v7/mode555/");
     $t->assertNotEmpty($dir1);
     $t->assertEquals($dir1->getName(), "env.v7/mode555/");
     $t->assertEquals($dir1->getSize(), 0);
-    $t->assertEquals($dir1->getMTime(), strtotime("1992.06.23 14:12"));
+    $t->assertEquals($dir1->getMTime(), strtotime("1992:06:23 14:12:00"));
     $t->assertEquals($dir1->getMode(), 0555);
     $t->assertEquals($dir1->getUserId(), posix_getuid());
     $t->assertEquals($dir1->getGroupId(), posix_getgid());
@@ -94,13 +111,11 @@ $t->test('Test phtar\v7\Archive', function() use($t, $databox) {
     #TODO more test
     
     fclose($fHandle);
-    #TODO remove //
-    echo $filename;
-    //unlink($filename);
+    unlink($filename);
     Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
-$t->test('Test phtar\v7\Archive', function() use($t, $databox) {
+$t->test('Test phtar\v7\Archive test a simple find(...)', function() use($t, $databox) {
     $cwd = getcwd();
     chdir(sys_get_temp_dir());
     require __DIR__ . '/assets/setup.env.v7.php';
@@ -116,10 +131,7 @@ $t->test('Test phtar\v7\Archive', function() use($t, $databox) {
     $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
         
     fclose($fHandle);
-    #TODO remove //
-    echo $filename;
-    //unlink($filename);
-    readline();
+    unlink($filename);
     Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
