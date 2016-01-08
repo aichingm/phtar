@@ -23,7 +23,7 @@ class ArchiveEntry implements Entry {
 
     public function getMode() {
         $this->handle->seek(100);
-        return intval($this->handle->read(8)); # 755 is already an oclta number
+        return intval($this->handle->read(8), 8); # 755 is already an oclta number
     }
 
     public function getUserId() {
@@ -42,7 +42,7 @@ class ArchiveEntry implements Entry {
     }
 
     public function getMTime() {
-        $this->handle->seek(124);
+        $this->handle->seek(136);
         return intval($this->handle->read(12), 8);
     }
 

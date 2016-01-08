@@ -9,7 +9,7 @@ mkdir(ENV_NAME);
 chdir(ENV_NAME);
 
 mkdir("mode777");
-mkdir("mode644", 0555);
+mkdir("mode555", 0555);
 mkdir("dir/in/dir", 0777, true);
 mkdir("mode755", 0755);
 
@@ -29,7 +29,9 @@ symlink("mode755/B.txt", "mode755/SLink.B");
 
 mkdir(str_repeat("this_is_a_long_dir/", 4), 0777, true);
 
-touch(str_repeat("this_is_a_long_dir/", 4)."FILE.txt");
+#touch(str_repeat("this_is_a_long_dir/", 4)."FILE.txt");
+touch(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", strtotime("1992.06.23 14:12"));
+chmod(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", 0755);
 file_put_contents("mode755/A.txt", str_repeat("FILE_", 15));
 
 link(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", "HLink_long");

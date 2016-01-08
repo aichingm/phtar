@@ -39,6 +39,7 @@ EOF;
     $t->assertEquals($reader->seek(0), 0);
     $t->assertEquals($reader->getc(), 'L');
     $t->assertEquals($reader->seek(0), 0);
+    $t->assertEquals($reader->read(0), "");
     $t->assertEquals($reader->read(strlen($testString)), $testString);
     $t->assertFalse($reader->eof(FileHandleReader::EOF_MODE_EOF));
     $t->assertTrue($reader->eof(FileHandleReader::EOF_MODE_LENGTH));

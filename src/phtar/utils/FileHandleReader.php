@@ -60,6 +60,9 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
     }
 
     public function read($length) {
+        if($length == 0){
+            return "";
+        }
         return fread($this->handle, $length);
     }
 

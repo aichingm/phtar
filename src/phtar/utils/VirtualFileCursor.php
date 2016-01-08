@@ -89,9 +89,10 @@ class VirtualFileCursor implements ReadFileFunctions {
 
     public function gets($length = null) {
         $string = $this->handle->gets($length);
-        if (strlen($string) + $this->offset > $this->fileEnd) {
-            $string = substr($string, 0, $this->fileEnd - $this->offset);
-            $this->offset = $this->fileEnd;
+        if (strlen($string) + $this->offset > $this->length()) {
+            $string = substr($string, 0, $this->length() - $this->offset);
+            $this->offset = $this->length();
+            $this->eofTried = true;
         } else {
             $this->offset += strlen($string);
         }
