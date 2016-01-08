@@ -62,15 +62,15 @@ class ArchiveEntry implements Entry {
         switch ($type) {
 
             case '1':
-                return self::ENTRY_TYPE_HARDLINK;
+                return Archive::ENTRY_TYPE_HARDLINK;
             case '2':
-                return self::ENTRY_TYPE_SOFTLINK;
+                return Archive::ENTRY_TYPE_SOFTLINK;
             case '5':
-                return self::ENTRY_TYPE_DIRECTORY;
+                return Archive::ENTRY_TYPE_DIRECTORY;
             case '0':
             case "\0":
             default:
-                return self::ENTRY_TYPE_FILE;
+                return Archive::ENTRY_TYPE_FILE;
         }
     }
 
