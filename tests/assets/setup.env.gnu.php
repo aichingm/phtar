@@ -1,7 +1,7 @@
 <?php
 
-define("ENV_NAME", "env.gnu");
-define("START_WDIR", getcwd());
+!(defined("ENV_NAME")) ? define("ENV_NAME", "env.v7"):0;
+$START_WDIR = getcwd();
 
 
 
@@ -51,4 +51,4 @@ file_put_contents("mode755/CMtime.txt", str_repeat("B", 5649));
 
 
 
-chdir(START_WDIR);
+chdir($START_WDIR);
