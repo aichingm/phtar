@@ -103,6 +103,7 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     $t->assertEquals($dir1->read(20), "");
     $t->assertEquals($dir1->gets(), "");
     $t->assertFalse($dir1->getc());
+    $t->assertEquals($dir1->length(), 0);
     $t->assertTrue($dir1->eof());
     $t->assertTrue($dir1->validateChecksum());
     $t->assertEquals($dir1->getContent(), "");
@@ -129,6 +130,29 @@ $t->test('Test phtar\v7\Archive test a simple find(...)', function() use($t, $da
  
     $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
     $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
+        
+    fclose($fHandle);
+    unlink($filename);
+    Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+});
+
+$t->test('Test phtar\v7\Archive if file is a hard link', function() use($t, $databox) {
+    $cwd = getcwd();
+    chdir(sys_get_temp_dir());
+    require __DIR__ . '/assets/setup.env.v7.php';
+    $filename = tempnam(sys_get_temp_dir(), 'Tar');
+    exec("bsdtar --format=v7 -cvf  $filename " . ENV_NAME);
+    chdir($cwd);
+    $fHandle = fopen($filename, "r");
+    $handle = new \phtar\utils\FileHandle($fHandle);
+
+    $archive = new \phtar\v7\Archive($handle);
+ 
+    
+    $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
+    
+    $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
+    $t->assertEquals($x->getType(), \phtar\v7\Archive::ENTRY_TYPE_HARDLINK);
         
     fclose($fHandle);
     unlink($filename);
