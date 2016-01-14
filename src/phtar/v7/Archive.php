@@ -174,20 +174,10 @@ class Archive implements \Iterator {
 
     public function next() {
         $size = $this->getSize();
-        if ($size == 0) {
-            $this->filePointer += 512;
-        } else {
-            //skip the header
-            $this->filePointer += 512;
-            //add the size
-            $this->filePointer += $size;
-            //calc the padding
-            $pad = 512 - ($size % 512);
-            //if the padding NOT is 512 add it
-            if ($pad != 512) {
-                $this->filePointer += $pad;
-            }
-        }
+        //skip the header
+        $this->filePointer += 512;
+        //add the padding to a multiple of 512
+        $this->filePointer += \phtar\utils\Math::NEXT_OR_CURR_MOD_0($size, 512);
         ++$this->pointer;
     }
 
