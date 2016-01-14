@@ -3,7 +3,6 @@
 /*
  * TODO
  * write* functions should seek to file beginn.
- * implement writeFinalBlocks.
  * test add!
  * test checksum
  * test with bsdtar, tar, star, ark
@@ -46,10 +45,7 @@ class ArchiveCreator implements \Countable {
         foreach ($this->entries as $entry) {
             $size = $entry->getSize();
             $this->currFileEnd = $this->currFileStart + 512;
-            if ($size > 0) {
-                $nullBytes = 512 - ( $size % 512 );
-                $this->currFileEnd += $nullBytes + $size;
-            }
+            $this->currFileEnd += \phtar\utils\Math::NEXT_OR_CURR_MOD_0($size, 512);
             $this->writeName($entry);
             $this->writeMode($entry);
             $this->writeUid($entry);
@@ -160,15 +156,17 @@ class ArchiveCreator implements \Countable {
         $this->seek(512);
         $size = $entry->copy2handle($this->handle);
         if ($size > 0) {
-            $nullBytes = 512 - ($size % 512);
-            $this->handle->write(str_repeat("\0", $nullBytes));
+            $nullBytes = \phtar\utils\Math::DIFF_NEXT_MOD_0($size, 512);
+            if ($nullBytes > 0) {
+                $this->handle->write(str_repeat("\0", $nullBytes));
+            }
         }
     }
 
     protected function writeFinalBlocks() {
-        $this->seek($this->currFileEnd);
-        $this->handle->write(str_repeat("\0", 512));
-        $this->handle->write(str_repeat("\0", 512));
+        $this->seek(0);
+        $this->handle->write(str_repeat(chr(0), 512));
+        $this->handle->write(str_repeat(chr(0), 512));
     }
 
     private function seek($offset) {
