@@ -1,21 +1,27 @@
 <?php
 
+use \Pest\Utils;
+use \phtar\v7\Archive;
+use \phtar\utils\FileHandle;
+
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
 
 
 $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $databox) {
-    $cwd = getcwd();
-    chdir(sys_get_temp_dir());
-    require __DIR__ . '/assets/setup.env.v7.php';
-    $filename = tempnam(sys_get_temp_dir(), 'Tar');
-    exec("bsdtar --format=v7 -cvf  $filename " . ENV_NAME);
-    chdir($cwd);
-    $fHandle = fopen($filename, "r");
-    $handle = new \phtar\utils\FileHandle($fHandle);
+    $filename = Utils::RUN_IN(function() {
+                require __DIR__ . '/assets/setup.env.v7.php';
+                exec("bsdtar --format=v7 -cvf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
+                return $f;
+            });
+    $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-
+    $t->assertEquals(filesize($filename) % 512, 0);
+    
+    $t->assertEquals(filesize($filename), 25600);
+    
+    
     $filelist = array(
         "env.v7/",
         "env.v7/SLink_long",
@@ -40,8 +46,6 @@ $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $
         "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"
     );
 
-
-    $archive = new \phtar\v7\Archive($handle);
     //test if all files are recognised 
     $size = 0;
     foreach ($archive as $file) {
@@ -54,26 +58,22 @@ $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $
         unset($filelist[$pos]);
     }
     $t->assertEmpty($filelist);
-    
+
     fclose($fHandle);
-    unlink($filename);
-    Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+    Utils::RM_TMP_FILES();
+    Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
 
 $t->test('Test if the phtar\v7\Archive contains correct files and directories', function() use($t, $databox) {
-    $cwd = getcwd();
-    chdir(sys_get_temp_dir());
-    require __DIR__ . '/assets/setup.env.v7.php';
-    $filename = tempnam(sys_get_temp_dir(), 'Tar');
-    exec("bsdtar --format=v7 -cvf  $filename " . ENV_NAME);
-    chdir($cwd);
-    $fHandle = fopen($filename, "r");
-    $handle = new \phtar\utils\FileHandle($fHandle);
+    $filename = Utils::RUN_IN(function() {
+                require __DIR__ . '/assets/setup.env.v7.php';
+                exec("bsdtar --format=v7 -cvf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
+                return $f;
+            });
+    $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
 
-    $archive = new \phtar\v7\Archive($handle);
-    
     $x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
     $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
     $t->assertEquals($x->getSize(), 0);
@@ -89,8 +89,8 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     $t->assertTrue($x->validateChecksum());
     $t->assertEquals($x->getContent(), "");
     $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
-    $t->assertEquals($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime()); 
-    
+    $t->assertEquals($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime());
+
     $dir1 = $archive->find("env.v7/mode555/");
     $t->assertNotEmpty($dir1);
     $t->assertEquals($dir1->getName(), "env.v7/mode555/");
@@ -108,57 +108,65 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     $t->assertTrue($dir1->validateChecksum());
     $t->assertEquals($dir1->getContent(), "");
     $t->assertEquals($dir1->getLinkname(), "");
-    
+
     #TODO more test
-    
+
     fclose($fHandle);
-    unlink($filename);
-    Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+    Utils::RM_TMP_FILES();
+    Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
 $t->test('Test phtar\v7\Archive test a simple find(...)', function() use($t, $databox) {
-    $cwd = getcwd();
-    chdir(sys_get_temp_dir());
-    require __DIR__ . '/assets/setup.env.v7.php';
-    $filename = tempnam(sys_get_temp_dir(), 'Tar');
-    exec("bsdtar --format=v7 -cvf  $filename " . ENV_NAME);
-    chdir($cwd);
-    $fHandle = fopen($filename, "r");
-    $handle = new \phtar\utils\FileHandle($fHandle);
+    $filename = Utils::RUN_IN(function() {
+                require __DIR__ . '/assets/setup.env.v7.php';
+                exec("bsdtar --format=v7 -cvf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
+                return $f;
+            });
+    $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-    $archive = new \phtar\v7\Archive($handle);
- 
+
     $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
     $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
-        
+
     fclose($fHandle);
-    unlink($filename);
-    Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+    Utils::RM_TMP_FILES();
+    Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
 $t->test('Test phtar\v7\Archive if file is a hard link', function() use($t, $databox) {
-    $cwd = getcwd();
-    chdir(sys_get_temp_dir());
-    require __DIR__ . '/assets/setup.env.v7.php';
-    $filename = tempnam(sys_get_temp_dir(), 'Tar');
-    exec("bsdtar --format=v7 -cvf  $filename " . ENV_NAME);
-    chdir($cwd);
-    $fHandle = fopen($filename, "r");
-    $handle = new \phtar\utils\FileHandle($fHandle);
+    $filename = Utils::RUN_IN(function() {
+                require __DIR__ . '/assets/setup.env.v7.php';
+                exec("bsdtar --format=v7 -cvf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
+                return $f;
+            });
+    $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-    $archive = new \phtar\v7\Archive($handle);
- 
-    
     $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
-    
+
     $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
-    $t->assertEquals($x->getType(), \phtar\v7\Archive::ENTRY_TYPE_HARDLINK);
-        
+    $t->assertEquals($x->getType(), Archive::ENTRY_TYPE_HARDLINK);
+
     fclose($fHandle);
-    unlink($filename);
-    Pest\Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+    Utils::RM_TMP_FILES();
+    Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
+$t->test('Test phtar\v7\Archive if file is a symbolic link', function() use($t, $databox) {
+    $filename = Utils::RUN_IN(function() {
+                require __DIR__ . '/assets/setup.env.v7.php';
+                exec("bsdtar --format=v7 -cvf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
+                return $f;
+            });
+    $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
+
+    $t->assertNotEmpty($x = $archive->find("env.v7/SLink_long"));
+
+    $t->assertEquals($x->getLinkname(), str_repeat("this_is_a_long_dir/", 4) . "FILE.txt");
+    $t->assertEquals($x->getType(), Archive::ENTRY_TYPE_SOFTLINK);
+    fclose($fHandle);
+    Utils::RM_TMP_FILES();
+    Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+});
 $t->run();
 
 
