@@ -33,7 +33,7 @@ $t->test('Test if the phtar\v7\ArchiveCreator', function() use($t, $databox) {
     $t->assertEquals($ae->getUserId(), 0);
     $t->assertEquals($ae->getLinkname(), "");
     $t->assertEquals($ae->getMTime(), $entry->getMTime());
-    $t->assertEquals($ae->getMode(), 0775);
+    $t->assertEquals($ae->getMode(), 0755);
     $t->assertEquals($ae->getSize(), 512);
     $t->assertEquals($ae->getType(), \phtar\v7\Archive::ENTRY_TYPE_FILE);
 
