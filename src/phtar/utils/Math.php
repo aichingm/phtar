@@ -19,6 +19,8 @@ class Math {
         $x = $int % $mod;
         if ($x == 0) {
             return $int;
+        } elseif ($x < 0) {
+            return $int + abs($x);
         } else {
             return $int + $mod - $x;
         }
@@ -28,6 +30,8 @@ class Math {
         $x = $int % $mod;
         if ($x == 0) {
             return 0;
+        } elseif ($x < 0) {
+            return abs($x);
         } else {
             return $mod - $x;
         }
