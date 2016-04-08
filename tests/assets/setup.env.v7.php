@@ -24,7 +24,7 @@ file_put_contents("mode755/B.txt", str_repeat("B", 5649));
 
 link("mode755/B.txt", "mode755/HLink.B");
 
-symlink("mode755/B.txt", "mode755/SLink.B");
+symlink("B.txt", "mode755/SLink.B");
 
 
 

@@ -58,6 +58,7 @@ class Archive extends \phtar\v7\Archive {
         $this->handle->seek($this->filePointer + 156);
         $type = $this->handle->getc();
         if (in_array($type, self::ENTRY_TYPES)) {
+            //echo $this->getName()." type ".$type.PHP_EOL;
             return strval($type);
         } else {
             throw new UnexpectedValueException("A valid type was expected");
@@ -70,11 +71,21 @@ class Archive extends \phtar\v7\Archive {
         $size = $this->getSize();
         $type = $this->getType();
         $fileOffset = $this->filePointer + 512;
-        if ($type == self::ENTRY_TYPE_HARDLINK || $type == self::ENTRY_TYPE_SOFTLINK) {
+        if ($type == self::ENTRY_TYPE_HARDLINK) {
             $fileOffset = $this->index[$this->getLinkname()];
             //read size diffrent record
             $size = intval($this->seekRead($fileOffset + 124, 12), 8);
             $fileOffset += 512;
+        } elseif ($type == self::ENTRY_TYPE_SOFTLINK) {
+            $this->buildIndex();
+            $realName = dirname($this->getName()) . "/" . $this->getLinkname();
+            //symlinks may point to a file outside of the archive
+            if (isset($this->index[$realName])) {
+                $fileOffset = $this->index[$realName];
+                //read size diffrent record
+                $size = intval($this->seekRead($fileOffset + 124, 12), 8);
+                $fileOffset += 512;
+            }
         } elseif ($type == self::ENTRY_TYPE_LONG_LINKNAME || $type == self::ENTRY_TYPE_LONG_PATHNAME) {
             if ($type == self::ENTRY_TYPE_LONG_LINKNAME) {
                 $this->additionalHeaders[self::ENTRY_TYPE_LONG_LINKNAME] = strstr($this->seekRead($this->filePointer + 512, $size), "\0", true);
@@ -99,6 +110,28 @@ class Archive extends \phtar\v7\Archive {
         //key is the last called function in the life cycle so we will delete headers after this call
         $this->additionalHeaders = array();
         return $name;
+    }
+
+    /*
+     * find functions
+     */
+
+    public function find($name) {
+        if (!$this->indexBuilt) {
+            $this->buildIndex();
+        }
+        if (!isset($this->index[$name])) {
+            var_dump(array_keys($this->index), $name);
+            return null;
+        }
+        $oldFilepointer = $this->filePointer;
+        $this->filePointer = $this->index[$name];
+        $this->current();
+        $this->filePointer = $oldFilepointer;
+        return new ArchiveEntry(clone $this->headerHandlePrototype, clone $this->contentHandlePrototype);
+        
+      
+        
     }
 
 }

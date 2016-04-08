@@ -26,10 +26,15 @@ class ArchiveCreator implements \Countable {
     }
 
     public function addWithParentDirectories(Entry $entry) {
-        $parts = array_pop(explode("/", $entry->getName()));
+        $parts = explode("/", $entry->getName());
+        $last = array_pop($parts);
+        if($last == ""){
+            array_pop($parts);
+        }
         $str = "";
+        
         foreach ($parts as $part) {
-            $this->add(new DirEntry($str . $part));
+            $this->add(new DirEntry($str . $part. "/"));
             $str .= $part . "/";
         }
         $this->add($entry);

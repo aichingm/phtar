@@ -1,15 +1,15 @@
 <?php
 
 use \Pest\Utils;
-use \phtar\v7\Archive;
+use \phtar\gnu\Archive;
 use \phtar\utils\FileHandle;
 
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
-define("ARCHIVE_FORMART", "--format=v7");
-define("ENV_CRATION_FILE", __DIR__ . '/assets/setup.env.v7.php');
-$t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $databox) {
+define("ARCHIVE_FORMART", "--format=gnutar");
+define("ENV_CRATION_FILE", __DIR__ . '/assets/setup.env.gnu.php');
+$t->test('Test if the phtar\gnu\Archive contains all files', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
                 exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
@@ -23,27 +23,27 @@ $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $
 
 
     $filelist = array(
-        "env.v7/",
-        "env.v7/SLink_long",
-        "env.v7/HLink_long",
-        "env.v7/this_is_a_long_dir/",
-        "env.v7/mode755/",
-        "env.v7/dir/",
-        "env.v7/mode555/",
-        "env.v7/mode777/",
-        "env.v7/dir/in/",
-        "env.v7/dir/in/dir/",
-        "env.v7/dir/in/dir/CMtime.txt",
-        "env.v7/mode755/CMtime.txt",
-        "env.v7/mode755/SLink.B",
-        "env.v7/mode755/HLink.B",
-        "env.v7/mode755/B.txt",
-        "env.v7/mode755/AB.txt",
-        "env.v7/mode755/A.txt",
-        "env.v7/this_is_a_long_dir/this_is_a_long_dir/",
-        "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/",
-        "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/",
-        "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"
+        "env.gnu/",
+        "env.gnu/SLink_long",
+        "env.gnu/HLink_long",
+        "env.gnu/this_is_a_long_dir/",
+        "env.gnu/mode755/",
+        "env.gnu/dir/",
+        "env.gnu/mode555/",
+        "env.gnu/mode777/",
+        "env.gnu/dir/in/",
+        "env.gnu/dir/in/dir/",
+        "env.gnu/dir/in/dir/CMtime.txt",
+        "env.gnu/mode755/CMtime.txt",
+        "env.gnu/mode755/SLink.B",
+        "env.gnu/mode755/HLink.B",
+        "env.gnu/mode755/B.txt",
+        "env.gnu/mode755/AB.txt",
+        "env.gnu/mode755/A.txt",
+        "env.gnu/this_is_a_long_dir/this_is_a_long_dir/",
+        "env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/",
+        "env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/",
+        "env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"
     );
 
     //test if all files are recognised 
@@ -65,7 +65,7 @@ $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $
 });
 
 
-$t->test('Test if the phtar\v7\Archive contains correct files and directories', function() use($t, $databox) {
+$t->test('Test if the phtar\gnu\Archive contains correct files and directories', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
                 exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
@@ -73,9 +73,9 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
             });
     $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-
-    $x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
-    $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
+    $x = $archive->find("env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
+    var_dump($archive->listEntries());
+    $t->assertEquals($x->getName(), "env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
     $t->assertEquals($x->getSize(), 0);
     $t->assertEquals($x->getMTime(), strtotime("1992:06:23 14:12:00"));
     $t->assertEquals($x->getMode(), 0755);
@@ -88,12 +88,12 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     $t->assertTrue($x->eof());
     $t->assertTrue($x->validateChecksum());
     $t->assertEquals($x->getContent(), "");
-    $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
-    $t->assertEquals($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime());
+    $t->assertEquals($x->getLinkname(), "env.gnu/HLink_long");
+    $t->assertEquals($archive->find("env.gnu/HLink_long")->getMTime(), $x->getMTime());
 
-    $dir1 = $archive->find("env.v7/mode555/");
+    $dir1 = $archive->find("env.gnu/mode555/");
     $t->assertNotEmpty($dir1);
-    $t->assertEquals($dir1->getName(), "env.v7/mode555/");
+    $t->assertEquals($dir1->getName(), "env.gnu/mode555/");
     $t->assertEquals($dir1->getSize(), 0);
     $t->assertEquals($dir1->getMTime(), strtotime("1992:06:23 14:12:00"));
     $t->assertEquals($dir1->getMode(), 0555);
@@ -116,7 +116,7 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
-$t->test('Test phtar\v7\Archive test a simple find(...)', function() use($t, $databox) {
+$t->test('Test phtar\gnu\Archive test a simple find(...)', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
                 exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
@@ -125,15 +125,15 @@ $t->test('Test phtar\v7\Archive test a simple find(...)', function() use($t, $da
     $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
 
-    $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
-    $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
+    $t->assertNotEmpty($x = $archive->find("env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
+    $t->assertEquals($x->getName(), "env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
 
     fclose($fHandle);
     Utils::RM_TMP_FILES();
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
-$t->test('Test phtar\v7\Archive if file is a hard link', function() use($t, $databox) {
+$t->test('Test phtar\gnu\Archive if file is a hard link', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
                 exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
@@ -141,9 +141,9 @@ $t->test('Test phtar\v7\Archive if file is a hard link', function() use($t, $dat
             });
     $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-    $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
+    $t->assertNotEmpty($x = $archive->find("env.gnu/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
 
-    $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
+    $t->assertEquals($x->getLinkname(), "env.gnu/HLink_long");
     $t->assertEquals($x->getType(), Archive::ENTRY_TYPE_HARDLINK);
 
     fclose($fHandle);
@@ -151,7 +151,7 @@ $t->test('Test phtar\v7\Archive if file is a hard link', function() use($t, $dat
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
-$t->test('Test phtar\v7\Archive if file is a symbolic link', function() use($t, $databox) {
+$t->test('Test phtar\gnu\Archive if file is a symbolic link', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
                 exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
@@ -159,7 +159,7 @@ $t->test('Test phtar\v7\Archive if file is a symbolic link', function() use($t, 
             });
     $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-    $t->assertNotEmpty($x = $archive->find("env.v7/SLink_long"));
+    $t->assertNotEmpty($x = $archive->find("env.gnu/SLink_long"));
 
     $t->assertEquals($x->getLinkname(), str_repeat("this_is_a_long_dir/", 4) . "FILE.txt");
     $t->assertEquals($x->getType(), Archive::ENTRY_TYPE_SOFTLINK);
@@ -168,9 +168,7 @@ $t->test('Test phtar\v7\Archive if file is a symbolic link', function() use($t, 
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 
-
-
-$t->test('Test phtar\v7\Archive find() a symlink with its contents if target exists', function() use($t, $databox) {
+$t->test('Test phtar\gnu\Archive test a simple find(...)', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
                 exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
@@ -179,7 +177,7 @@ $t->test('Test phtar\v7\Archive find() a symlink with its contents if target exi
     $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
 
-    $t->assertNotEmpty($x = $archive->find("env.v7/SLink_long"));
+    $t->assertNotEmpty($x = $archive->find("env.gnu/SLink_long"));
     $t->assertSame($x->getContent(), null);
 
     fclose($fHandle);

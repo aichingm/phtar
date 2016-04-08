@@ -53,6 +53,10 @@ class Archive implements \Iterator {
         }
         $this->indexBuilt = true;
     }
+    public function listEntries(){
+        $this->buildIndex();
+        return array_keys($this->index);
+    }
 
     /*
      * current file funcitons
@@ -160,6 +164,16 @@ class Archive implements \Iterator {
             //read size diffrent record
             $size = intval($this->seekRead($fileOffset + 124, 12), 8);
             $fileOffset += 512;
+        } elseif ($type == self::ENTRY_TYPE_SOFTLINK) {
+            $this->buildIndex();
+            $realName = dirname($this->getName()) . "/" . $this->getLinkname();
+            //symlinks may point to a file outside of the archive
+            if (isset($this->index[$realName])) {
+                $fileOffset = $this->index[$realName];
+                //read size diffrent record
+                $size = intval($this->seekRead($fileOffset + 124, 12), 8);
+                $fileOffset += 512;
+            }
         }
         #$this->headerHandlePrototype->setBoundaries($this->filePointer, 512);
         $this->headerHandlePrototype->setString($this->seekRead($this->filePointer, 512));

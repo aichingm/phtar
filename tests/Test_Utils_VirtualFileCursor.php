@@ -110,7 +110,7 @@ EOF;
 
 $t->test("Test VirtaulFileCursor with FileHandleReader no line break", function() use($t, $databox) {
     $testString = "Lorem ipsum dolor sit amet, consetetur sadipscin";
-    var_dump(strlen($testString));
+    #var_dump(strlen($testString));
 
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
@@ -134,7 +134,7 @@ $t->test("Test VirtaulFileCursor with FileHandleReader no line break", function(
 
 $t->test("Test VirtaulFileCursor with FileHandleReader one line break", function() use($t, $databox) {
     $testString = "Lorem ipsum dolor sit ame\nt, consetetur sadipscin";
-    var_dump(strlen($testString));
+    #var_dump(strlen($testString));
 
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
@@ -157,7 +157,7 @@ $t->test("Test VirtaulFileCursor with FileHandleReader one line break", function
 });
 $t->test("Test VirtaulFileCursor with  FileHandleReader empty VitrualFileCursor", function() use($t, $databox) {
     $testString = "1234567890abc";
-    var_dump(strlen($testString));
+    #var_dump(strlen($testString));
 
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
@@ -178,7 +178,7 @@ $t->test("Test VirtaulFileCursor with  FileHandleReader empty VitrualFileCursor"
 });
 $t->test("Test VirtaulFileCursor with FileHandleReader  VitrualFileCursor", function() use($t, $databox) {
     $testString = "1234567890abc";
-    var_dump(strlen($testString));
+    #var_dump(strlen($testString));
 
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
