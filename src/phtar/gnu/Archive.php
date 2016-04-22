@@ -2,6 +2,11 @@
 
 namespace phtar\gnu;
 
+/**
+ * Description of Archive
+ *
+ * @author Mario Aichinger
+ */
 class Archive extends \phtar\v7\Archive {
 
     const ENTRY_TYPE_FILE = 0;
@@ -37,23 +42,60 @@ class Archive extends \phtar\v7\Archive {
         self::ENTRY_TYPE_TAPE_VOLUME_HEADER_NAME
     );
 
+    /**
+     * Holds the additional headers
+     * @var array 
+     */
     protected $additionalHeaders = array();
 
+    /**
+     * Holds true if the additional headers are used and ready to be unset
+     * @var bool
+     */
+    protected $additionalHeadersDirty = false;
+
+    /**
+     * Scanns the archive and builds an index like array(<int offset> => <string name of the file>)
+     */
+    public function buildIndex() {
+        if (!$this->indexBuilt) {
+            $filePointer = $this->filePointer;
+            while ($this->valid()) {
+                $this->next();
+                $this->current(); #this is needed to handle the additional headers ($this->additionalHeaders, $this->additionalHeaders->dirty)
+                $this->index[$this->getName()] = $this->filePointer;
+            }
+            $this->filePointer = $filePointer;
+        }
+        $this->indexBuilt = true;
+    }
+
     /*
-     * current file funcitons
+     * Current File Funcitons
      */
 
+    /**
+     * Returns the name of the current entry
+     * @return string
+     */
     public function getName() {
         if (isset($this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME])) {
+            #echo "from addidtion: ".$this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME].PHP_EOL;
 
             return $this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME];
         } else {
             $this->handle->seek($this->filePointer + 0);
             $name = strstr($this->handle->read(100), "\0", true);
+            #echo "from header: $name".PHP_EOL;
             return $name;
         }
     }
 
+    /**
+     * Returns the type of the current entry
+     * @return string
+     * @throws UnexpectedValueException if the type is not one of the expected ones. See: Archive::ENTRY_TYPES
+     */
     public function getType() {
         $this->handle->seek($this->filePointer + 156);
         $type = $this->handle->getc();
@@ -65,7 +107,16 @@ class Archive extends \phtar\v7\Archive {
         }
     }
 
+    /**
+     * Returns the current entry
+     * @overrides \Iterator::current()
+     * @return ArchiveEntry
+     */
     public function current() {
+        if ($this->additionalHeadersDirty) {
+            $this->additionalHeadersDirty = false;
+            $this->additionalHeaders = array();
+        }
 
 
         $size = $this->getSize();
@@ -102,26 +153,34 @@ class Archive extends \phtar\v7\Archive {
         $entry = new ArchiveEntry($this->headerHandlePrototype, $this->contentHandlePrototype);
         $headers = $this->additionalHeaders;
         $entry->setAdditionalHeaders($headers);
+        $this->additionalHeadersDirty = true;
         return $entry;
     }
-
+    /**
+     * Returns the key of the current entry which equals the name of the entry
+     * @return string
+     * @overrides \Iterator::key()
+     */
     public function key() {
         $name = $this->getName();
-        //key is the last called function in the life cycle so we will delete headers after this call
-        $this->additionalHeaders = array();
         return $name;
     }
 
     /*
-     * find functions
+     * Find Functions
      */
-
+    
+    /**
+     * Searches the archive for an entry by it's name
+     * Builds the index if necessary
+     * @param string $name
+     * @return \phtar\gnu\ArchiveEntry
+     */
     public function find($name) {
         if (!$this->indexBuilt) {
             $this->buildIndex();
         }
         if (!isset($this->index[$name])) {
-            var_dump(array_keys($this->index), $name);
             return null;
         }
         $oldFilepointer = $this->filePointer;
@@ -129,9 +188,6 @@ class Archive extends \phtar\v7\Archive {
         $this->current();
         $this->filePointer = $oldFilepointer;
         return new ArchiveEntry(clone $this->headerHandlePrototype, clone $this->contentHandlePrototype);
-        
-      
-        
     }
 
 }

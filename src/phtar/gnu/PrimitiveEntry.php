@@ -12,6 +12,24 @@ class PrimitiveEntry extends \phtar\v7\PrimitiveEntry implements Entry {
     private $realName, $userName, $groupName, $devMajor, $devMinor, $aTime,
             $cTime, $offset, $sparseList, $isExtended, $realSize, $longNames;
 
+    public function __construct() {
+        $this->setName("PrimitiveEntry")->setContent("");
+        $this->setLinkname("");
+        $this->setUserId(0)->setGroupId(0);
+        $this->setUserName("root")->setGroupName("wheel");
+        $this->setMode(600);
+        $this->setSize(0)->setRealSize(0);
+        $this->setType(Archive::ENTRY_TYPE_FILE);
+        $this->setDevMajor(0)->setDevMinor(0);
+        $this->setMTime($time = time());
+        $this->setATime($time);
+        $this->setCTime($time);
+        $this->setExtended(0);
+        $this->setOffset(0);
+        $this->setLongNames(str_repeat("\0", 4));
+        $this->setSparseList(array(0 => array('offset' => 0, 'numbytes' => 0,), 1 => array('offset' => 0, 'numbytes' => 0,), 2 => array('offset' => 0, 'numbytes' => 0,), 3 => array('offset' => 0, 'numbytes' => 0,)));
+    }
+
     public function getRealName() {
         return $this->realName;
     }
@@ -119,7 +137,5 @@ class PrimitiveEntry extends \phtar\v7\PrimitiveEntry implements Entry {
         $this->longNames = $longNames;
         return $this;
     }
-
-
 
 }
