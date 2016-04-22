@@ -17,9 +17,9 @@ $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $
             });
     $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
 
-    $t->assertEquals(filesize($filename) % 512, 0);
+    $t->assertSame(filesize($filename) % 512, 0);
 
-    $t->assertEquals(filesize($filename), 25600);
+    $t->assertSame(filesize($filename), 25600);
 
 
     $filelist = array(
@@ -51,7 +51,7 @@ $t->test('Test if the phtar\v7\Archive contains all files', function() use($t, $
     foreach ($archive as $file) {
         $size++;
     }
-    $t->assertEquals($size, count($filelist));
+    $t->assertSame($size, count($filelist));
     //test if al files from the list are present
     foreach ($archive as $name => $file) {
         $pos = array_search($name, $filelist);
@@ -75,39 +75,39 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
 
 
     $x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
-    $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
-    $t->assertEquals($x->getSize(), 0);
-    $t->assertEquals($x->getMTime(), strtotime("1992:06:23 14:12:00"));
-    $t->assertEquals($x->getMode(), 0755);
-    $t->assertEquals($x->getUserId(), posix_getuid());
-    $t->assertEquals($x->getGroupId(), posix_getgid());
+    $t->assertSame($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
+    $t->assertSame($x->getSize(), 0);
+    $t->assertSame($x->getMTime(), strtotime("1992:06:23 14:12:00"));
+    $t->assertSame($x->getMode(), 0755);
+    $t->assertSame($x->getUserId(), posix_getuid());
+    $t->assertSame($x->getGroupId(), posix_getgid());
     $t->assertFalse($x->getc());
-    $t->assertEquals($x->read(20), "");
-    $t->assertEquals($x->gets(), "");
+    $t->assertSame($x->read(20), "");
+    $t->assertSame($x->gets(), "");
     $t->assertFalse($x->getc());
     $t->assertTrue($x->eof());
     $t->assertTrue($x->validateChecksum());
-    $t->assertEquals($x->getContent(), "");
-    $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
-    $t->assertEquals($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime());
+    $t->assertSame($x->getContent(), null);
+    $t->assertSame($x->getLinkname(), "env.v7/HLink_long");
+    $t->assertSame($archive->find("env.v7/HLink_long")->getMTime(), $x->getMTime());
 
     $dir1 = $archive->find("env.v7/mode555/");
     $t->assertNotEmpty($dir1);
-    $t->assertEquals($dir1->getName(), "env.v7/mode555/");
-    $t->assertEquals($dir1->getSize(), 0);
-    $t->assertEquals($dir1->getMTime(), strtotime("1992:06:23 14:12:00"));
-    $t->assertEquals($dir1->getMode(), 0555);
-    $t->assertEquals($dir1->getUserId(), posix_getuid());
-    $t->assertEquals($dir1->getGroupId(), posix_getgid());
+    $t->assertSame($dir1->getName(), "env.v7/mode555/");
+    $t->assertSame($dir1->getSize(), 0);
+    $t->assertSame($dir1->getMTime(), strtotime("1992:06:23 14:12:00"));
+    $t->assertSame($dir1->getMode(), 0555);
+    $t->assertSame($dir1->getUserId(), posix_getuid());
+    $t->assertSame($dir1->getGroupId(), posix_getgid());
     $t->assertFalse($dir1->getc());
-    $t->assertEquals($dir1->read(20), "");
-    $t->assertEquals($dir1->gets(), "");
+    $t->assertSame($dir1->read(20), "");
+    $t->assertSame($dir1->gets(), "");
     $t->assertFalse($dir1->getc());
-    $t->assertEquals($dir1->length(), 0);
+    $t->assertSame($dir1->length(), 0);
     $t->assertTrue($dir1->eof());
     $t->assertTrue($dir1->validateChecksum());
-    $t->assertEquals($dir1->getContent(), "");
-    $t->assertEquals($dir1->getLinkname(), "");
+    $t->assertSame($dir1->getContent(), null);
+    $t->assertSame($dir1->getLinkname(), "");
 
     #TODO more test
 
@@ -126,7 +126,7 @@ $t->test('Test phtar\v7\Archive test a simple find(...)', function() use($t, $da
 
 
     $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
-    $t->assertEquals($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
+    $t->assertSame($x->getName(), "env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt");
 
     fclose($fHandle);
     Utils::RM_TMP_FILES();
@@ -143,8 +143,8 @@ $t->test('Test phtar\v7\Archive if file is a hard link', function() use($t, $dat
 
     $t->assertNotEmpty($x = $archive->find("env.v7/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/this_is_a_long_dir/FILE.txt"));
 
-    $t->assertEquals($x->getLinkname(), "env.v7/HLink_long");
-    $t->assertEquals($x->getType(), Archive::ENTRY_TYPE_HARDLINK);
+    $t->assertSame($x->getLinkname(), "env.v7/HLink_long");
+    $t->assertSame($x->getType(), Archive::ENTRY_TYPE_HARDLINK);
 
     fclose($fHandle);
     Utils::RM_TMP_FILES();
@@ -161,8 +161,8 @@ $t->test('Test phtar\v7\Archive if file is a symbolic link', function() use($t, 
 
     $t->assertNotEmpty($x = $archive->find("env.v7/SLink_long"));
 
-    $t->assertEquals($x->getLinkname(), str_repeat("this_is_a_long_dir/", 4) . "FILE.txt");
-    $t->assertEquals($x->getType(), Archive::ENTRY_TYPE_SOFTLINK);
+    $t->assertSame($x->getLinkname(), str_repeat("this_is_a_long_dir/", 4) . "FILE.txt");
+    $t->assertSame($x->getType(), Archive::ENTRY_TYPE_SOFTLINK);
     fclose($fHandle);
     Utils::RM_TMP_FILES();
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);

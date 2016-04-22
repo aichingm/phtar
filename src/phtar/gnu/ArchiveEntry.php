@@ -1,6 +1,7 @@
 <?php
 
 namespace phtar\gnu;
+
 /**
  * Description of ArchiveEntry
  *
@@ -59,13 +60,16 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
     /**
      * Returns the type of the header
      * @overrides \phtar\v7\ArchiveEntry::getType()
-     * @return string
+     * @return mixed
      * @throws UnexpectedValueException
      */
     public function getType() {
         $this->handle->seek(156);
         $type = $this->handle->getc();
         if (in_array($type, Archive::ENTRY_TYPES)) {
+            if (is_numeric($type)) {
+                return (int) $type;
+            }
             return strval($type);
         } else {
             throw new UnexpectedValueException("A valid type was expected");
@@ -175,7 +179,7 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
      */
     public function getRealSize() {
         $this->handle->seek(483);
-        return intval($this->handle->read(32),8);
+        return intval($this->handle->read(32), 8);
     }
 
 }

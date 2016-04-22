@@ -17,25 +17,25 @@ $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
     $ac->write();
 
     $fsize = filesize($filename);
-    $t->assertEquals($fsize % 512, 0);
-    $t->assertEquals($fsize, 2048);
+    $t->assertSame($fsize % 512, 0);
+    $t->assertSame($fsize, 2048);
 
     $file = file_get_contents($filename);
-    $t->assertEquals(strlen($file), 2048);
+    $t->assertSame(strlen($file), 2048);
 
 
-    $t->assertEquals(substr($file, 512, 512), str_repeat("X", 512));
-    $t->assertEquals(substr($file, 1024, 1024), str_repeat(chr(0), 1024));
+    $t->assertSame(substr($file, 512, 512), str_repeat("X", 512));
+    $t->assertSame(substr($file, 1024, 1024), str_repeat(chr(0), 1024));
 
     $ae = new phtar\v7\ArchiveEntry(new \phtar\utils\StringCursor(substr($file, 0, 512)), new \phtar\utils\StringCursor(substr($file, 512, 512)));
 
-    $t->assertEquals($ae->getGroupId(), 0);
-    $t->assertEquals($ae->getUserId(), 0);
-    $t->assertEquals($ae->getLinkname(), "");
-    $t->assertEquals($ae->getMTime(), $entry->getMTime());
-    $t->assertEquals($ae->getMode(), 0755);
-    $t->assertEquals($ae->getSize(), 512);
-    $t->assertEquals($ae->getType(), \phtar\v7\Archive::ENTRY_TYPE_FILE);
+    $t->assertSame($ae->getGroupId(), 0);
+    $t->assertSame($ae->getUserId(), 0);
+    $t->assertSame($ae->getLinkname(), "");
+    $t->assertSame($ae->getMTime(), $entry->getMTime());
+    $t->assertSame($ae->getMode(), 0755);
+    $t->assertSame($ae->getSize(), 512);
+    $t->assertSame($ae->getType(), \phtar\v7\Archive::ENTRY_TYPE_FILE);
 
     fclose($fHandle);
     Utils::RM_TMP_FILES();
@@ -56,7 +56,7 @@ $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
 
     $ac->write();
 
-    $t->assertEquals(filesize($filename), 512 * 4 + 512 + 512 + 3072 + 512 + 3072 + 512 + 6 * 2048 + 512 + 15 * 2048 + 512 * 2);
+    $t->assertSame(filesize($filename), 512 * 4 + 512 + 512 + 3072 + 512 + 3072 + 512 + 6 * 2048 + 512 + 15 * 2048 + 512 * 2);
 
 
     fclose($fHandle);
