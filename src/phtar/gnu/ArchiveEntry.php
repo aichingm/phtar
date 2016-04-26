@@ -38,8 +38,12 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
             return $this->additionalHeaders[Archive::ENTRY_TYPE_LONG_PATHNAME];
         } else {
             $this->handle->seek(0);
-            $name = strstr($this->handle->read(100), "\0", true);
-            return $name;
+            $name = $this->handle->read(100);
+            if(strpos($name, "\0") === FALSE) {
+                return $name;
+            } else {
+                return strstr($name, "\0", true);
+            }
         }
     }
 
@@ -52,8 +56,12 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
             return $this->additionalHeaders[Archive::ENTRY_TYPE_LONG_LINKNAME];
         } else {
             $this->handle->seek(157);
-            $name = strstr($this->handle->read(100), "\0", true);
-            return $name;
+            $linkname = $this->handle->read(100);
+            if(strpos($linkname, "\0") === FALSE) {
+                return $linkname;
+            } else {
+                return strstr($linkname, "\0", true);
+            }
         }
     }
 

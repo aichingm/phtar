@@ -107,6 +107,7 @@ class Archive implements \Iterator {
         }
         $this->indexBuilt = Archive::INDEX_STATE_BUILT;
     }
+
     /**
      * Returns a list of entry names
      * @return array
@@ -185,7 +186,12 @@ class Archive implements \Iterator {
      */
     public function getLinkname() {
         $this->handle->seek($this->filePointer + 157);
-        return strstr($this->handle->read(100), "\0", true);
+        $linkname = $this->handle->read(100);
+        if (strpos($linkname, "\0") === FALSE) {
+            return $linkname;
+        } else {
+            return strstr($linkname, "\0", true);
+        }
     }
 
     public function validateChecksum() {

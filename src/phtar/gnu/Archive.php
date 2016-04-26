@@ -86,9 +86,7 @@ class Archive extends \phtar\v7\Archive {
         if (isset($this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME])) {
             return $this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME];
         } else {
-            $this->handle->seek($this->filePointer + 0);
-            $name = strstr($this->handle->read(100), "\0", true);
-            return $name;
+            return parent::getName();
         }
     }
 
