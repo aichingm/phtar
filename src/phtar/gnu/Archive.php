@@ -53,21 +53,24 @@ class Archive extends \phtar\v7\Archive {
      * @var bool
      */
     protected $additionalHeadersDirty = false;
+    protected $additionalHeadersStart = null;
 
     /**
      * Scanns the archive and builds an index like array(<int offset> => <string name of the file>)
+     * @overrides \phtar\v7\Archive::buildIndex()
      */
     public function buildIndex() {
-        if (!$this->indexBuilt) {
+        if ($this->indexState != Archive::INDEX_STATE_BUILT) {
+            $this->indexState = Archive::INDEX_STATE_BUILDING;
             $filePointer = $this->filePointer;
             while ($this->valid()) {
-                $this->next();
                 $this->current(); #this is needed to handle the additional headers ($this->additionalHeaders, $this->additionalHeaders->dirty)
-                $this->index[$this->getName()] = $this->filePointer;
+                $this->index[$this->getName()] = is_null($this->additionalHeadersStart) ? $this->filePointer : $this->additionalHeadersStart;
+                $this->next();
             }
             $this->filePointer = $filePointer;
         }
-        $this->indexBuilt = true;
+        $this->indexBuilt = Archive::INDEX_STATE_BUILT;
     }
 
     /*
@@ -76,18 +79,29 @@ class Archive extends \phtar\v7\Archive {
 
     /**
      * Returns the name of the current entry
+     * @overrides \phtar\v7\Archive::getName() 
      * @return string
      */
     public function getName() {
         if (isset($this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME])) {
-            #echo "from addidtion: ".$this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME].PHP_EOL;
-
             return $this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME];
         } else {
             $this->handle->seek($this->filePointer + 0);
             $name = strstr($this->handle->read(100), "\0", true);
-            #echo "from header: $name".PHP_EOL;
             return $name;
+        }
+    }
+
+    /**
+     * Returns the name of the current entry
+     * @overrides \phtar\v7\Archive::getLinkname()
+     * @return string
+     */
+    public function getLinkname() {
+        if (isset($this->additionalHeaders[self::ENTRY_TYPE_LONG_LINKNAME])) {
+            return $this->additionalHeaders[self::ENTRY_TYPE_LONG_LINKNAME];
+        } else {
+            return parent::getLinkname();
         }
     }
 
@@ -100,7 +114,6 @@ class Archive extends \phtar\v7\Archive {
         $this->handle->seek($this->filePointer + 156);
         $type = $this->handle->getc();
         if (in_array($type, self::ENTRY_TYPES)) {
-            //echo $this->getName()." type ".$type.PHP_EOL;
             return strval($type);
         } else {
             throw new UnexpectedValueException("A valid type was expected");
@@ -113,22 +126,27 @@ class Archive extends \phtar\v7\Archive {
      * @return ArchiveEntry
      */
     public function current() {
+
         if ($this->additionalHeadersDirty) {
             $this->additionalHeadersDirty = false;
             $this->additionalHeaders = array();
+            $this->additionalHeadersStart = null;
         }
-
 
         $size = $this->getSize();
         $type = $this->getType();
         $fileOffset = $this->filePointer + 512;
         if ($type == self::ENTRY_TYPE_HARDLINK) {
-            $fileOffset = $this->index[$this->getLinkname()];
-            //read size diffrent record
-            $size = intval($this->seekRead($fileOffset + 124, 12), 8);
-            $fileOffset += 512;
+            if (isset($this->index[$name = $this->getLinkname()])) {
+                $fileOffset = $this->index[$name];
+                //read size diffrent record
+                $size = intval($this->seekRead($fileOffset + 124, 12), 8);
+                $fileOffset += 512;
+            }
         } elseif ($type == self::ENTRY_TYPE_SOFTLINK) {
-            $this->buildIndex();
+            if ($this->indexState == Archive::INDEX_STATE_NONE) {
+                $this->buildIndex();
+            }
             $realName = dirname($this->getName()) . "/" . $this->getLinkname();
             //symlinks may point to a file outside of the archive
             if (isset($this->index[$realName])) {
@@ -138,6 +156,9 @@ class Archive extends \phtar\v7\Archive {
                 $fileOffset += 512;
             }
         } elseif ($type == self::ENTRY_TYPE_LONG_LINKNAME || $type == self::ENTRY_TYPE_LONG_PATHNAME) {
+            if (is_null($this->additionalHeadersStart)) {
+                $this->additionalHeadersStart = $this->filePointer;
+            }
             if ($type == self::ENTRY_TYPE_LONG_LINKNAME) {
                 $this->additionalHeaders[self::ENTRY_TYPE_LONG_LINKNAME] = strstr($this->seekRead($this->filePointer + 512, $size), "\0", true);
             } elseif ($type == self::ENTRY_TYPE_LONG_PATHNAME) {
@@ -146,7 +167,7 @@ class Archive extends \phtar\v7\Archive {
             $this->next();
             return $this->current();
         }
-        $this->index[$this->getName()] = $this->filePointer;
+        $this->index[$this->getName()] = is_null($this->additionalHeadersStart) ? $this->filePointer : $this->additionalHeadersStart;
         #$this->headerHandlePrototype->setBoundaries($this->filePointer, 512);
         $this->headerHandlePrototype->setString($this->seekRead($this->filePointer, 512));
         $this->contentHandlePrototype->setBoundaries($fileOffset, $size);
@@ -156,6 +177,7 @@ class Archive extends \phtar\v7\Archive {
         $this->additionalHeadersDirty = true;
         return $entry;
     }
+
     /**
      * Returns the key of the current entry which equals the name of the entry
      * @return string
@@ -169,7 +191,7 @@ class Archive extends \phtar\v7\Archive {
     /*
      * Find Functions
      */
-    
+
     /**
      * Searches the archive for an entry by it's name
      * Builds the index if necessary
@@ -177,7 +199,7 @@ class Archive extends \phtar\v7\Archive {
      * @return \phtar\gnu\ArchiveEntry
      */
     public function find($name) {
-        if (!$this->indexBuilt) {
+        if ($this->indexState == Archive::INDEX_STATE_NONE) {
             $this->buildIndex();
         }
         if (!isset($this->index[$name])) {
@@ -185,9 +207,13 @@ class Archive extends \phtar\v7\Archive {
         }
         $oldFilepointer = $this->filePointer;
         $this->filePointer = $this->index[$name];
-        $this->current();
+        $a = $this->current();
         $this->filePointer = $oldFilepointer;
-        return new ArchiveEntry(clone $this->headerHandlePrototype, clone $this->contentHandlePrototype);
+        return $a;
+    }
+
+    public function getIndex() {
+        return $this->index;
     }
 
 }

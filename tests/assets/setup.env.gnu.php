@@ -1,6 +1,6 @@
 <?php
 
-!(defined("ENV_NAME")) ? define("ENV_NAME", "env.gnu"):0;
+!(defined("ENV_NAME")) ? define("ENV_NAME", "env.gnu") : 0;
 $START_WDIR = getcwd();
 
 
@@ -30,20 +30,23 @@ symlink("B.txt", "mode755/SLink.B");
 
 mkdir(str_repeat("this_is_a_long_dir/", 4), 0777, true);
 
-touch(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", strtotime("1992:06:23 14:12:00"));
-chmod(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", 0755);
+touch(str_repeat("this_is_a_long_dir/", 4) . "FILE.txt", strtotime("1992:06:23 14:12:00"));
+chmod(str_repeat("this_is_a_long_dir/", 4) . "FILE.txt", 0755);
 file_put_contents("mode755/A.txt", str_repeat("FILE_", 15));
 
-link(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", "HLink_long");
-symlink(str_repeat("this_is_a_long_dir/", 4)."FILE.txt", "SLink_long");
+link(str_repeat("this_is_a_long_dir/", 4) . "FILE.txt", "HLink_long");
+symlink(str_repeat("this_is_a_long_dir/", 4) . "FILE.txt", "SLink_long");
 
 mkdir(str_repeat("this_is_an_extreme_long_directory/", 20), 0777, true);
-touch(str_repeat("this_is_an_extreme_long_directory/", 20)."Extrem_Long_File", strtotime("1992:06:23 14:12:00"));
+touch(str_repeat("this_is_an_extreme_long_directory/", 20) . "Extrem_Long_File", strtotime("1992:06:23 14:12:00"));
 
 
 touch("dir/in/dir/CMtime.txt");
 file_put_contents("mode755/CMtime.txt", str_repeat("B", 5649));
 
+#just leave .link and .file as they are just dont touch it
+touch(str_repeat("oOoO_", 25) . ".link");
+link(str_repeat("oOoO_", 25) . ".link", str_repeat("xXxX_", 25) . ".file");
 
 
 

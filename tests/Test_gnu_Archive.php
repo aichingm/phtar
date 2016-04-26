@@ -9,6 +9,8 @@ $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
 define("ARCHIVE_FORMART", "--format=gnutar");
 define("ENV_CRATION_FILE", __DIR__ . '/assets/setup.env.gnu.php');
+define("ENV_NAME", 'env.gnu');
+
 $t->test('Test if the phtar\gnu\Archive contains all files', function() use($t, $databox) {
     $filename = Utils::RUN_IN(function() {
                 require ENV_CRATION_FILE;
@@ -19,7 +21,7 @@ $t->test('Test if the phtar\gnu\Archive contains all files', function() use($t, 
 
     $t->assertEquals(filesize($filename) % 512, 0);
 
-    $t->assertEquals(filesize($filename), 59392);
+    $t->assertEquals(filesize($filename), 59392 + (8 * 512));
 
 
     $filelist = array(
@@ -64,7 +66,9 @@ $t->test('Test if the phtar\gnu\Archive contains all files', function() use($t, 
         "env.gnu/" . str_repeat("this_is_an_extreme_long_directory/", 18),
         "env.gnu/" . str_repeat("this_is_an_extreme_long_directory/", 19),
         "env.gnu/" . str_repeat("this_is_an_extreme_long_directory/", 20),
-        "env.gnu/" . str_repeat("this_is_an_extreme_long_directory/", 20) . "Extrem_Long_File"
+        "env.gnu/" . str_repeat("this_is_an_extreme_long_directory/", 20) . "Extrem_Long_File",
+        "env.gnu/" . str_repeat("oOoO_", 25) . ".link",
+        "env.gnu/" . str_repeat("xXxX_", 25) . ".file"
     );
 
 //test if all files are recognised 
@@ -73,6 +77,7 @@ $t->test('Test if the phtar\gnu\Archive contains all files', function() use($t, 
         $size++;
     }
     $t->assertEquals($size, count($filelist));
+    $t->assertEquals(count($archive->getIndex()), count($filelist));
 //test if al files from the list are present
     foreach ($archive as $name => $file) {
         $pos = array_search($name, $filelist);
@@ -83,7 +88,6 @@ $t->test('Test if the phtar\gnu\Archive contains all files', function() use($t, 
         }
     }
     $t->assertEmpty($filelist);
-
     fclose($fHandle);
     Utils::RM_TMP_FILES();
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
@@ -180,7 +184,7 @@ $t->test('Test if the phtar\gnu\Archive contains correct files and directories',
     $t->assertSame($dir1->getRealSize(), 0);
     $t->assertFalse($dir1->getc());
     $t->assertSame($dir1->read(20), "");
-    $t->assertSame($dir1->gets(), "");
+    $t->assertSame($dir1->gets(), false);
     $t->assertFalse($dir1->getc());
     $t->assertSame($dir1->length(), 0);
     $t->assertTrue($dir1->eof());
@@ -263,6 +267,32 @@ $t->test('Test phtar\gnu\Archive test a simple find(...)', function() use($t, $d
     Utils::RM_TMP_FILES();
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
+
+$t->test('Test phtar\gnu\Archive long link names (longer than 100 bytes)', function()use($t) {
+    $filename = Utils::RUN_IN(function() {
+                mkdir(ENV_NAME);
+                chdir(ENV_NAME);
+                touch(str_repeat("oOoO_", 25) . ".link");
+                link(str_repeat("oOoO_", 25) . ".link", str_repeat("xXxX_", 25) . ".file");
+                chdir("..");
+                exec("bsdtar " . ARCHIVE_FORMART . " -cf " . ($f = Utils::TMP_FILE('Tar')) . " " . ENV_NAME);
+                return $f;
+            });
+    $archive = new Archive(new FileHandle($fHandle = fopen($filename, "r")));
+
+
+    $t->assertNotEmpty($x = $archive->find(ENV_NAME . "/" . str_repeat("xXxX_", 25) . ".file"));
+    $t->assertSame($x->getType(), Archive::ENTRY_TYPE_FILE);
+    $t->assertSame($x->getName(), ENV_NAME . "/" . str_repeat("xXxX_", 25) . ".file");
+
+    $t->assertNotEmpty($y = $archive->find(ENV_NAME . "/" . str_repeat("oOoO_", 25) . ".link"));
+    $t->assertSame($y->getType(), Archive::ENTRY_TYPE_HARDLINK);
+    $t->assertSame($y->getLinkname(), ENV_NAME . "/" . str_repeat("xXxX_", 25) . ".file");
+    fclose($fHandle);
+    Utils::RM_TMP_FILES();
+    Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
+});
+
 
 
 $t->run();

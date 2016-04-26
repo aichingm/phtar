@@ -2,21 +2,66 @@
 
 namespace phtar\v7;
 
+/**
+ * Description of Archive
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 class Archive implements \Iterator {
 
     const ENTRY_TYPE_FILE = 0;
     const ENTRY_TYPE_DIRECTORY = 1;
     const ENTRY_TYPE_HARDLINK = 2;
     const ENTRY_TYPE_SOFTLINK = 3;
+    const INDEX_STATE_NONE = 0;
+    const INDEX_STATE_BUILDING = 1;
+    const INDEX_STATE_BUILT = 2;
 
+    /**
+     *
+     * @var \phtar\utils\FileHandleReader 
+     */
     protected $handle;
+
+    /**
+     *
+     * @var array 
+     */
     protected $index = array();
-    protected $indexBuilt = false;
+
+    /**
+     *
+     * @var int
+     */
+    protected $indexState = 0;
+
+    /**
+     *
+     * @var int
+     */
     protected $pointer = 0;
+
+    /**
+     *
+     * @var int
+     */
     protected $filePointer = 0;
+
+    /**
+     *
+     * @var \phtar\utils\StringCursor
+     */
     protected $headerHandlePrototype;
+
+    /**
+     *
+     * @var \phtar\utils\VirtualFileCursor
+     */
     protected $contentHandlePrototype;
 
+    /**
+     * Createa a new Archive object
+     * @param \phtar\utils\FileHandleReader $handle
+     */
     public function __construct(\phtar\utils\FileHandleReader $handle) {
         #$this->headerHandlePrototype = new phtar\utils\VirtualFileCursor(clone $handle, 0, 0);
         $this->headerHandlePrototype = new \phtar\utils\StringCursor("");
@@ -24,6 +69,10 @@ class Archive implements \Iterator {
         $this->handle = $handle;
     }
 
+    /**
+     * Checks if all checksums in the archive's headers are valid
+     * @return boolean
+     */
     public function validate() {
         $filePointer = $this->filePointer;
         $violations = array();
@@ -42,8 +91,13 @@ class Archive implements \Iterator {
         }
     }
 
+    /**
+     * Scanns the archive and builds an index like array(<int offset> => <string name of the file>)
+     * While building the index the property $this->indexState is set to Archive::INDEX_STATE_BUILDING, after the index is built $this->indexState is set to Archive::INDEX_STATE_BUILT
+     */
     public function buildIndex() {
-        if (!$this->indexBuilt) {
+        if ($this->indexState != Archive::INDEX_STATE_BUILT) {
+            $this->indexState = Archive::INDEX_STATE_BUILDING;
             $filePointer = $this->filePointer;
             while ($this->valid()) {
                 $this->next();
@@ -51,33 +105,58 @@ class Archive implements \Iterator {
             }
             $this->filePointer = $filePointer;
         }
-        $this->indexBuilt = true;
+        $this->indexBuilt = Archive::INDEX_STATE_BUILT;
     }
-    public function listEntries(){
+    /**
+     * Returns a list of entry names
+     * @return array
+     */
+    public function listEntries() {
         $this->buildIndex();
         return array_keys($this->index);
     }
 
     /*
-     * current file funcitons
+     * Current File Funcitons
      */
 
+    /**
+     * Returns the name of the current entry
+     * @return string
+     */
     public function getName() {
         $this->handle->seek($this->filePointer + 0);
-        return strstr($this->handle->read(100), "\0", true);
+        $name = $this->handle->read(100);
+        if (strpos($name, "\0") === FALSE) {
+            return $name;
+        } else {
+            return strstr($name, "\0", true);
+        }
     }
 
+    /**
+     * Returns the size of the content of the current entry
+     * @return string
+     */
     public function getSize() {
         $this->handle->seek($this->filePointer + 124);
         return intval($this->handle->read(12), 8);
     }
 
+    /**
+     * Returns the checksum of the current entry's header
+     * @return string
+     */
     public function getChecksum() {
         $this->handle->seek($this->filePointer + 148);
         $checksum = $this->handle->read(8);
         return intval($checksum, 8);
     }
 
+    /**
+     * Returns the type of the current entry
+     * @return mixed
+     */
     public function getType() {
         $this->handle->seek($this->filePointer + 156);
         $type = $this->handle->getc();
@@ -96,10 +175,14 @@ class Archive implements \Iterator {
             case '5':
                 return self::ENTRY_TYPE_DIRECTORY;
             default:
-                throw new \UnexpectedValueException("A valid type was expected");
+                throw new \UnexpectedValueException("A valid type was expected. Got: [$type]");
         }
     }
 
+    /**
+     * Returns the name of the current entry
+     * @return string
+     */
     public function getLinkname() {
         $this->handle->seek($this->filePointer + 157);
         return strstr($this->handle->read(100), "\0", true);
@@ -125,6 +208,12 @@ class Archive implements \Iterator {
      * utility functions
      */
 
+    /**
+     * Seeks to a position and reads the $length from the handle 
+     * @param int $position
+     * @param int $length
+     * @return string
+     */
     protected function seekRead($position, $length) {
         $this->handle->seek($position);
         return $this->handle->read($length);
@@ -134,6 +223,12 @@ class Archive implements \Iterator {
      * find functions
      */
 
+    /**
+     * Searches the archive for an entry by it's name
+     * Builds the index if necessary
+     * @param string $name
+     * @return \phtar\gnu\ArchiveEntry
+     */
     public function find($name) {
         if (!$this->indexBuilt) {
             $this->buildIndex();
@@ -152,6 +247,11 @@ class Archive implements \Iterator {
      * Iterator functions
      */
 
+    /**
+     * Returns the current entry
+     * @overrides \Iterator::current()
+     * @return ArchiveEntry
+     */
     public function current() {
         if (!$this->indexBuilt) {
             $this->index[$this->getName()] = $this->filePointer;
@@ -182,10 +282,20 @@ class Archive implements \Iterator {
         return new ArchiveEntry($this->headerHandlePrototype, $this->contentHandlePrototype);
     }
 
+    /**
+     * Returns the key related to current entry
+     * @overrides \Iterator::key()
+     * @return string
+     */
     public function key() {
         return $this->getName();
     }
 
+    /**
+     * Moves to the next element of the iterator 
+     * @overrides \Iterator::next()
+     * @return ArchiveEntry
+     */
     public function next() {
         $size = $this->getSize();
         //skip the header
@@ -195,11 +305,18 @@ class Archive implements \Iterator {
         ++$this->pointer;
     }
 
+    /**
+     * Rewindes the the iterator to its beginning
+     */
     public function rewind() {
         $this->pointer = 0;
         $this->filePointer = 0;
     }
 
+    /**
+     * Checks if the current element is a valid one or if the iterator hit its end
+     * @return boolean
+     */
     public function valid() {
         for ($i = 0; $i < 1024; $i += 8) {
             $this->handle->seek($this->filePointer + $i);
