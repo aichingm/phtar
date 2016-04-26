@@ -236,7 +236,7 @@ class Archive implements \Iterator {
      * @return \phtar\gnu\ArchiveEntry
      */
     public function find($name) {
-        if (!$this->indexBuilt) {
+        if ($this->indexState == Archive::INDEX_STATE_NONE) {
             $this->buildIndex();
         }
         if (!isset($this->index[$name])) {
@@ -259,7 +259,7 @@ class Archive implements \Iterator {
      * @return ArchiveEntry
      */
     public function current() {
-        if (!$this->indexBuilt) {
+        if ($this->indexState == Archive::INDEX_STATE_NONE) {
             $this->index[$this->getName()] = $this->filePointer;
         }
         $size = $this->getSize();
@@ -271,7 +271,9 @@ class Archive implements \Iterator {
             $size = intval($this->seekRead($fileOffset + 124, 12), 8);
             $fileOffset += 512;
         } elseif ($type == self::ENTRY_TYPE_SOFTLINK) {
-            $this->buildIndex();
+            if ($this->indexState == Archive::INDEX_STATE_NONE) {
+                $this->buildIndex();
+            }
             $realName = dirname($this->getName()) . "/" . $this->getLinkname();
             //symlinks may point to a file outside of the archive
             if (isset($this->index[$realName])) {
