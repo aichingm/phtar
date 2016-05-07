@@ -72,8 +72,8 @@ $t->test('Test if the phtar\posix\Archive contains all files', function() use($t
     }
     $t->assertEmpty($filelist);
     fclose($fHandle);
-    echo $filename;
-//Utils::RM_TMP_FILES();
+    #echo $filename;
+    Utils::RM_TMP_FILES();
     Utils::RM_RF(sys_get_temp_dir() . DIRECTORY_SEPARATOR . ENV_NAME);
 });
 

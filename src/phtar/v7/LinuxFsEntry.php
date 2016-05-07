@@ -7,7 +7,7 @@ namespace phtar\v7;
  * 
  * @author Mario Aichinger <aichingm@gmail.com>
  */
-class LinuxFsEntry implements Entry {
+class LinuxFsEntry extends PrimitiveEntry {
 
     /**
      * Holds the name/path of the file 
@@ -16,19 +16,15 @@ class LinuxFsEntry implements Entry {
     protected $filename = "";
 
     /**
-     * Holds the nasme of the file to which this file is a link. Note if this is not set to "" (empty string) getType() will return 1
-     * @var string 
-     */
-    protected $linkname = "";
-
-    /**
      * Creats a new LinuxFsEntry object
      * @param string $filename
      * @param string $linkname
      * @throws \UnexpectedValueException gets thrown if $filename is not a file (is_file) or if $filename is not readable (is_readable)
      */
     public function __construct($filename, $linkname = "") {
-        if (!is_file($filename) || !is_readable($filename)) {
+        parent::__construct();
+
+        if (!(is_file($filename) || is_dir($filename)) || !is_readable($filename)) {
             throw new \UnexpectedValueException("readable file expected");
         }
 
@@ -37,7 +33,40 @@ class LinuxFsEntry implements Entry {
         }
 
         $this->filename = $filename;
-        $this->linkname = $linkname;
+        $this->setName($filename);
+        $this->setType($this->investigateType());
+        $this->setSize(0);
+        $this->setMode(substr(sprintf('%o', fileperms($this->filename)), -4));
+        $this->setLinkname($linkname);
+        $this->setMTime(filemtime($this->filename));
+        $this->setUserId(fileowner($this->filename));
+        $this->setGroupId(filegroup($this->filename));
+    }
+
+    /**
+     * Returns the type
+     * @return mixed
+     */
+    protected function investigateType() {
+        if (is_dir($this->filename)) {
+            return Archive::ENTRY_TYPE_DIRECTORY;
+        } elseif ($this->getLinkname() !== "") {
+            return Archive::ENTRY_TYPE_HARDLINK;
+        } else {
+            return Archive::ENTRY_TYPE_FILE;
+        }
+    }
+
+    /**
+     * Returns the size of the file
+     * @return int
+     */
+    protected function investigateFileSize() {
+        if (is_file($this->filename)) {
+            return filesize($this->filename);
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -52,81 +81,6 @@ class LinuxFsEntry implements Entry {
         } else {
             return 0;
         }
-    }
-
-    /**
-     * Returns the  group id
-     * @return int
-     */
-    public function getGroupId() {
-        return filegroup($this->filename);
-    }
-
-    /**
-     * Returns the linkname
-     * @return string
-     */
-    public function getLinkname() {
-        return $this->linkname;
-    }
-
-    /**
-     * Returns the  last modification time
-     * @return int
-     */
-    public function getMTime() {
-        return filemtime($this->filename);
-    }
-
-    /**
-     * Returns the  mode
-     * @return int
-     */
-    public function getMode() {
-        return substr(sprintf('%o', fileperms($this->filename)), -4);
-    }
-
-    /**
-     * Returns the name
-     * @return string
-     */
-    public function getName() {
-        return $this->filename;
-    }
-
-    /**
-     * Returns the size 
-     * @return int
-     */
-    public function getSize() {
-
-        if (is_file($this->filename)) {
-            return filesize($this->filename);
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * Returns the type
-     * @return mixed
-     */
-    public function getType() {
-        if (is_dir($this->filename)) {
-            return Archive::ENTRY_TYPE_DIRECTORY;
-        } elseif ($this->linkname !== "") {
-            return Archive::ENTRY_TYPE_HARDLINK;
-        } else {
-            return Archive::ENTRY_TYPE_FILE;
-        }
-    }
-
-    /**
-     * Returns the user id
-     * @return int
-     */
-    public function getUserId() {
-        return fileowner($this->filename);
     }
 
 }

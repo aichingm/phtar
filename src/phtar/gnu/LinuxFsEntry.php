@@ -73,17 +73,17 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         }
         switch ($type) {
             case 'file':
-                return (string) \phtar\posixUs\Archive::ENTRY_TYPE_FILE;
+                return (string) \phtar\posix\Archive::ENTRY_TYPE_FILE;
             case 'hardlink':
-                return (string) \phtar\posixUs\Archive::ENTRY_TYPE_HARDLINK;
+                return (string) \phtar\posix\Archive::ENTRY_TYPE_HARDLINK;
             case 'link':
-                return (string) \phtar\posixUs\Archive::ENTRY_TYPE_SOFTLINK;
+                return (string) \phtar\posix\Archive::ENTRY_TYPE_SOFTLINK;
             case 'char':
-                return (string) \phtar\posixUs\Archive::ENTRY_TYPE_CHAR_DEV_NODE;
+                return (string) \phtar\posix\Archive::ENTRY_TYPE_CHAR_DEV_NODE;
             case 'block':
-                return (string) \phtar\posixUs\Archive::ENTRY_TYPE_BLOCK_DEV_NODE;
+                return (string) \phtar\posix\Archive::ENTRY_TYPE_BLOCK_DEV_NODE;
             case 'dir':
-                return (string) \phtar\posixUs\Archive::ENTRY_TYPE_DIRECTORY;
+                return (string) \phtar\posix\Archive::ENTRY_TYPE_DIRECTORY;
         }
     }
 

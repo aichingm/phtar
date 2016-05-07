@@ -7,7 +7,7 @@ namespace phtar\v7;
  * 
  * @author Mario Aichinger <aichingm@gmail.com>
  */
-class Archive implements \Iterator {
+class Archive extends \phtar\Archive {
 
     const ENTRY_TYPE_FILE = 0;
     const ENTRY_TYPE_DIRECTORY = 5;
@@ -63,7 +63,7 @@ class Archive implements \Iterator {
      * Createa a new Archive object
      * @param \phtar\utils\FileHandleReader $handle
      */
-    public function __construct(\phtar\utils\FileHandleReader $handle) {
+    public function __construct(\phtar\utils\ReadFileFunctions $handle) {
         #$this->headerHandlePrototype = new phtar\utils\VirtualFileCursor(clone $handle, 0, 0);
         $this->headerHandlePrototype = new \phtar\utils\StringCursor("");
         $this->contentHandlePrototype = new \phtar\utils\VirtualFileCursor(clone $handle, 0, 0);
@@ -246,7 +246,7 @@ class Archive implements \Iterator {
      * Searches the archive for an entry by it's name
      * Builds the index if necessary
      * @param string $name
-     * @return \phtar\gnu\ArchiveEntry
+     * @return \phtar\v7\ArchiveEntry
      */
     public function find($name) {
         if ($this->indexState == Archive::INDEX_STATE_NONE) {
