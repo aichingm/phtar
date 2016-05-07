@@ -33,12 +33,14 @@ $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
     $t->assertSame($ae->getUserId(), 0);
     $t->assertSame($ae->getLinkname(), "");
     $t->assertSame($ae->getMTime(), $entry->getMTime());
-    $t->assertSame($ae->getMode(), 0755);
+    $t->assertSame($ae->getMode(), 0600);
     $t->assertSame($ae->getSize(), 512);
     $t->assertSame($ae->getType(), \phtar\v7\Archive::ENTRY_TYPE_FILE);
 
     fclose($fHandle);
-    Utils::RM_TMP_FILES();
+    echo $filename;    
+#Utils::RM_TMP_FILES();
+    
 });
 
 

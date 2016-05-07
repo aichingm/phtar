@@ -1,10 +1,8 @@
 <?php
 
-namespace phtar\posixUs;
+namespace phtar\posix;
 
 interface Entry extends \phtar\v7\Entry {
-
-    public function getRealName();
 
     public function getUserName();
 
@@ -13,6 +11,4 @@ interface Entry extends \phtar\v7\Entry {
     public function getDevMajor();
 
     public function getDevMinor();
-
-    public function getPrefix();
 }

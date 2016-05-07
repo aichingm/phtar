@@ -170,7 +170,7 @@ $t->test("Test VirtaulFileCursor with  FileHandleReader empty VitrualFileCursor"
     //new VirtualFileCursor
     $reader = new VirtualFileCursor($file, 10, strlen($testString) - 13);
     $t->assertFalse($reader->eof(StringCursor::EOF_MODE_EOF));
-    $t->assertSame($reader->gets(), "");
+    $t->assertSame($reader->gets(), false);
     $t->assertTrue($reader->eof(StringCursor::EOF_MODE_EOF));
 
     fclose($handle);
@@ -191,7 +191,7 @@ $t->test("Test VirtaulFileCursor with FileHandleReader  VitrualFileCursor", func
     //new VirtualFileCursor
     $reader = new VirtualFileCursor($file, 10, strlen($testString) - 13);
     $t->assertFalse($reader->eof(StringCursor::EOF_MODE_EOF));
-    $t->assertSame($reader->gets(), "");
+    $t->assertSame($reader->gets(), false);
     $t->assertTrue($reader->eof(StringCursor::EOF_MODE_EOF));
 
     fclose($handle);

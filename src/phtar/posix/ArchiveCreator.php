@@ -9,7 +9,7 @@
  * test with bsdtar, tar, star, ark
  */
 
-namespace phtar\posixUs;
+namespace phtar\posix;
 
 class ArchiveCreator implements \Countable {
 
@@ -25,16 +25,17 @@ class ArchiveCreator implements \Countable {
     public function add(Entry $entry) {
         $this->entries[] = $entry;
     }
+
     public function addWithParentDirectories(Entry $entry) {
         $parts = explode("/", $entry->getName());
         $last = array_pop($parts);
-        if($last == ""){
+        if ($last == "") {
             array_pop($parts);
         }
         $str = "";
-        
+
         foreach ($parts as $part) {
-            $this->add(new DirEntry($str . $part. "/"));
+            $this->add(new DirectoryEntry($str . $part . "/"));
             $str .= $part . "/";
         }
         $this->add($entry);
@@ -51,7 +52,7 @@ class ArchiveCreator implements \Countable {
             $size = $entry->getSize();
             $this->currFileEnd = $this->currFileStart + 512;
             if ($size > 0) {
-                $nullBytes = 512 - ( $size % 512 );
+                $nullBytes = \phtar\utils\Math::DIFF_NEXT_MOD_0($size, 512);
                 $this->currFileEnd += $nullBytes + $size;
             }
             $this->writeName($entry);
@@ -80,7 +81,7 @@ class ArchiveCreator implements \Countable {
 
     protected function writeName(Entry $entry) {
         if (strlen($entry->getName()) > 99) {
-            throw new \phtar\utils\TarException("Entry name is too long");
+            throw new \phtar\utils\TarException("Entry name is too long---");
         }
         $name = str_pad($entry->getName(), 100, "\0", STR_PAD_RIGHT);
         $this->seek(0);
@@ -88,7 +89,7 @@ class ArchiveCreator implements \Countable {
     }
 
     protected function writeMode(Entry $entry) {
-        $mode = str_pad($entry->getMode() . " \0", 8, '0', STR_PAD_LEFT);
+        $mode = str_pad(decoct($entry->getMode()) . " \0", 8, '0', STR_PAD_LEFT);
         $this->seek(100);
         $this->handle->write($mode);
     }
@@ -208,7 +209,7 @@ class ArchiveCreator implements \Countable {
     }
 
     protected function writeFinalBlocks() {
-        $this->seek($this->currFileEnd);
+        $this->seek(0);
         $this->handle->write(str_repeat("\0", 512));
         $this->handle->write(str_repeat("\0", 512));
     }

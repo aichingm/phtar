@@ -1,6 +1,6 @@
 <?php
 
-namespace phtar\v7;
+namespace phtar\posix;
 
 /**
  * Description of BaseEntry
@@ -13,7 +13,7 @@ class BaseEntry extends PrimitiveEntry {
         parent::__construct();
         $this->setName($name)->setContent($content);
         $this->setSize(strlen($content));
-        $this->setMode(0600);
+        $this->setType(Archive::ENTRY_TYPE_FILE);
     }
 
 }

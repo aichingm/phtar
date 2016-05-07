@@ -1,6 +1,6 @@
 <?php
 
-namespace phtar\posixUs;
+namespace phtar\posix;
 
 /**
  * Description of LinuxFsEntry
@@ -27,10 +27,6 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         }
 
         return $name;
-    }
-
-    public function getRealName() {
-        return $this->filename;
     }
 
     public function getDevMajor() {

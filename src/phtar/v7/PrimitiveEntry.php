@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace phtar\v7;
 
 /**
@@ -13,17 +11,18 @@ class PrimitiveEntry implements Entry {
 
     private $groupId, $linkname, $mTime, $mode, $name, $size, $type, $userId, $content;
 
+    public function __construct() {
+        $this->setName("PrimitiveEntry")->setContent("");
+        $this->setLinkname("");
+        $this->setUserId(0)->setGroupId(0);
+        $this->setMode(0600);
+        $this->setSize(0);
+        $this->setType(Archive::ENTRY_TYPE_FILE);
+        $this->setMTime(time());
+    }
+
     public function copy2handle(\phtar\utils\WriteFileFunctions $destHandle, $bufferSize = null) {
         return $destHandle->write($this->content);
-    }
-
-    public function getContent() {
-        return $this->content;
-    }
-
-    public function setContent($content) {
-        $this->content = $content;
-        return $this;
     }
 
     public function getGroupId() {
@@ -56,6 +55,10 @@ class PrimitiveEntry implements Entry {
 
     public function getUserId() {
         return $this->userId;
+    }
+
+    public function getContent() {
+        return $this->content;
     }
 
     public function setGroupId($groupId) {
@@ -97,6 +100,10 @@ class PrimitiveEntry implements Entry {
         $this->userId = $userId;
         return $this;
     }
-    
+
+    public function setContent($content) {
+        $this->content = $content;
+        return $this;
+    }
 
 }

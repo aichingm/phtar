@@ -86,7 +86,7 @@ class ArchiveCreator implements \Countable {
         $size = $entry->getSize();
         $this->currFileEnd = $this->currFileStart + 512;
         if ($size > 0) {
-            $nullBytes = \phtar\utils\Math::DIFF_NEXT_MOD_0($this->currFileEnd, 512);
+            $nullBytes = \phtar\utils\Math::DIFF_NEXT_MOD_0($size, 512);
             $this->currFileEnd += $nullBytes + $size;
         }
         $this->writeName($entry);
@@ -156,7 +156,7 @@ class ArchiveCreator implements \Countable {
      * @param \phtar\gnu\Entry $entry
      */
     protected function writeMode(Entry $entry) {
-        $mode = str_pad($entry->getMode() . " \0", 8, '0', STR_PAD_LEFT);
+        $mode = str_pad(decoct($entry->getMode()) . " \0", 8, '0', STR_PAD_LEFT);
         $this->seek(100);
         $this->handle->write($mode);
     }

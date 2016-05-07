@@ -153,7 +153,7 @@ $t->test('Test if the phtar\gnu\Archive contains correct files and directories',
 
     $t->assertFalse($x->getc());
     $t->assertSame($x->read(20), "");
-    $t->assertSame($x->gets(), "");
+    $t->assertSame($x->gets(), false);
     $t->assertFalse($x->getc());
     $t->assertTrue($x->eof());
     $t->assertTrue($x->validateChecksum());

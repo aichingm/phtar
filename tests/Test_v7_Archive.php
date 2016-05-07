@@ -83,7 +83,7 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     $t->assertSame($x->getGroupId(), posix_getgid());
     $t->assertFalse($x->getc());
     $t->assertSame($x->read(20), "");
-    $t->assertSame($x->gets(), "");
+    $t->assertSame($x->gets(), false);
     $t->assertFalse($x->getc());
     $t->assertTrue($x->eof());
     $t->assertTrue($x->validateChecksum());
@@ -101,7 +101,7 @@ $t->test('Test if the phtar\v7\Archive contains correct files and directories', 
     $t->assertSame($dir1->getGroupId(), posix_getgid());
     $t->assertFalse($dir1->getc());
     $t->assertSame($dir1->read(20), "");
-    $t->assertSame($dir1->gets(), "");
+    $t->assertSame($dir1->gets(), false);
     $t->assertFalse($dir1->getc());
     $t->assertSame($dir1->length(), 0);
     $t->assertTrue($dir1->eof());

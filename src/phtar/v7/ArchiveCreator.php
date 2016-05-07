@@ -1,13 +1,5 @@
 <?php
 
-/*
- * TODO
- * write* functions should seek to file beginn.
- * test add!
- * test checksum
- * test with bsdtar, tar, star, ark
- */
-
 namespace phtar\v7;
 
 class ArchiveCreator implements \Countable {
@@ -28,13 +20,13 @@ class ArchiveCreator implements \Countable {
     public function addWithParentDirectories(Entry $entry) {
         $parts = explode("/", $entry->getName());
         $last = array_pop($parts);
-        if($last == ""){
+        if ($last == "") {
             array_pop($parts);
         }
         $str = "";
-        
+
         foreach ($parts as $part) {
-            $this->add(new DirEntry($str . $part. "/"));
+            $this->add(new DirEntry($str . $part . "/"));
             $str .= $part . "/";
         }
         $this->add($entry);
@@ -78,7 +70,7 @@ class ArchiveCreator implements \Countable {
     }
 
     protected function writeMode(Entry $entry) {
-        $mode = str_pad($entry->getMode() . " \0", 8, '0', STR_PAD_LEFT);
+        $mode = str_pad(decoct($entry->getMode()) . " \0", 8, '0', STR_PAD_LEFT);
         $this->seek(100);
         $this->handle->write($mode);
     }

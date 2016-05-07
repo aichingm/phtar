@@ -17,11 +17,19 @@ class ArchiveEntry implements Entry {
     }
 
     public function getName() {
-        $this->handle->seek(0);
-        return strstr($this->handle->read(100), "\0", true);
+       $this->handle->seek(0);
+        $name = $this->handle->read(100);
+        if (strpos($name, "\0") === FALSE) {
+            return $name;
+        } else {
+            return strstr($name, "\0", true);
+        }
     }
 
     public function getMode() {
+        $this->handle->seek(100);
+        
+        var_dump(intval($this->handle->read(8),8)); # 755 is already an oclta number
         $this->handle->seek(100);
         return intval($this->handle->read(8), 8); # 755 is already an oclta number
     }
@@ -113,7 +121,8 @@ class ArchiveEntry implements Entry {
     }
 
     public function gets($length = null) {
-        return $this->contentHandle->gets($length);
+        ($x = $this->contentHandle->gets($length));
+        return $x;
     }
 
     public function length() {

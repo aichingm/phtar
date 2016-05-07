@@ -82,7 +82,7 @@ class Archive extends \phtar\v7\Archive {
      * @overrides \phtar\v7\Archive::getName() 
      * @return string
      */
-    public function getName() {
+    protected function getName() {
         if (isset($this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME])) {
             return $this->additionalHeaders[self::ENTRY_TYPE_LONG_PATHNAME];
         } else {
@@ -95,7 +95,7 @@ class Archive extends \phtar\v7\Archive {
      * @overrides \phtar\v7\Archive::getLinkname()
      * @return string
      */
-    public function getLinkname() {
+    protected function getLinkname() {
         if (isset($this->additionalHeaders[self::ENTRY_TYPE_LONG_LINKNAME])) {
             return $this->additionalHeaders[self::ENTRY_TYPE_LONG_LINKNAME];
         } else {
@@ -108,7 +108,7 @@ class Archive extends \phtar\v7\Archive {
      * @return string
      * @throws UnexpectedValueException if the type is not one of the expected ones. See: Archive::ENTRY_TYPES
      */
-    public function getType() {
+    protected function getType() {
         $this->handle->seek($this->filePointer + 156);
         $type = $this->handle->getc();
         if (in_array($type, self::ENTRY_TYPES)) {
@@ -169,8 +169,20 @@ class Archive extends \phtar\v7\Archive {
         #$this->headerHandlePrototype->setBoundaries($this->filePointer, 512);
         $this->headerHandlePrototype->setString($this->seekRead($this->filePointer, 512));
         $this->contentHandlePrototype->setBoundaries($fileOffset, $size);
-        $entry = new ArchiveEntry($this->headerHandlePrototype, $this->contentHandlePrototype);
-        $headers = $this->additionalHeaders;
+
+        return $this->createArchiveEntry($this->headerHandlePrototype, $this->contentHandlePrototype);
+    }
+
+    /**
+     * Override this function to create a new Entry object
+     * @Overrides \phtar\v7\Archive::createArchiveEntry()
+     * @param type $headerHandlePrototype
+     * @param type $contentHandlePrototype
+     * @return \phtar\posix\ArchiveEntry
+     */
+    protected function createArchiveEntry($headerHandlePrototype, $contentHandlePrototype) {
+        $entry = new ArchiveEntry($headerHandlePrototype, $contentHandlePrototype);
+        $headers = $this->additionalHeaders; #this line clons the array
         $entry->setAdditionalHeaders($headers);
         $this->additionalHeadersDirty = true;
         return $entry;
@@ -208,10 +220,6 @@ class Archive extends \phtar\v7\Archive {
         $a = $this->current();
         $this->filePointer = $oldFilepointer;
         return $a;
-    }
-
-    public function getIndex() {
-        return $this->index;
     }
 
 }

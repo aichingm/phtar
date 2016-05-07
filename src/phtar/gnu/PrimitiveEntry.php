@@ -9,29 +9,21 @@ namespace phtar\gnu;
  */
 class PrimitiveEntry extends \phtar\v7\PrimitiveEntry implements Entry {
 
-    private $realName, $userName, $groupName, $devMajor, $devMinor, $aTime,
+    private $userName, $groupName, $devMajor, $devMinor, $aTime,
             $cTime, $offset, $sparseList, $isExtended, $realSize, $longNames;
 
     public function __construct() {
-        $this->setName("PrimitiveEntry")->setContent("");
-        $this->setLinkname("");
-        $this->setUserId(0)->setGroupId(0);
+        parent::__construct();
         $this->setUserName("root")->setGroupName("wheel");
-        $this->setMode(600);
-        $this->setSize(0)->setRealSize(0);
-        $this->setType(Archive::ENTRY_TYPE_FILE);
         $this->setDevMajor(0)->setDevMinor(0);
         $this->setMTime($time = time());
         $this->setATime($time);
         $this->setCTime($time);
+        $this->setRealSize(0);
         $this->setExtended(0);
         $this->setOffset(0);
         $this->setLongNames(str_repeat("\0", 4));
         $this->setSparseList(array(0 => array('offset' => 0, 'numbytes' => 0,), 1 => array('offset' => 0, 'numbytes' => 0,), 2 => array('offset' => 0, 'numbytes' => 0,), 3 => array('offset' => 0, 'numbytes' => 0,)));
-    }
-
-    public function getRealName() {
-        return $this->realName;
     }
 
     public function getUserName() {
@@ -76,11 +68,6 @@ class PrimitiveEntry extends \phtar\v7\PrimitiveEntry implements Entry {
 
     public function getLongNames() {
         return $this->longNames;
-    }
-
-    public function setRealName($realName) {
-        $this->realName = $realName;
-        return $this;
     }
 
     public function setUserName($userName) {
