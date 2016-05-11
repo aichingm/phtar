@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
@@ -38,7 +43,7 @@ EOF;
     $t->assertEquals($writer->write("test"), 4);
     $t->assertTrue($writer->seek(0) === 0);
     $t->assertEquals(fread($handle, 5), "testm");
-    
+
     $newWriter = clone $writer;
     $t->assertEquals($newWriter->seek(0), 0);
     $t->assertEquals($writer->seek(1), 0);

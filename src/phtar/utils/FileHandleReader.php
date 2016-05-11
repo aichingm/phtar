@@ -9,13 +9,27 @@ namespace phtar\utils;
  */
 class FileHandleReader implements \phtar\utils\ReadFileFunctions {
 
+    /**
+     * Holds a seekable resource
+     * @var resource 
+     */
     protected $handle;
+
+    /**
+     * Hold true if the __destruct() method should close the resource (file descriptor) $this->handle
+     * @var boolean 
+     */
     private $closeFd = false;
+
     const EOF_MODE_EOF = 0;
     const EOF_MODE_LENGTH = 1;
     const EOF_MODE_TRY_READ = 2;
-    
 
+    /**
+     * Creates a new FileHandleReader object
+     * @param resource $handle
+     * @throws \UnexpectedValueException
+     */
     function __construct($handle) {
         if (!is_resource($handle)) {
             throw new \UnexpectedValueException("expecting a resource");
@@ -23,6 +37,10 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
         $this->handle = $handle;
     }
 
+    /**
+     * Checks if the end of the file is reached
+     * @return boolean
+     */
     public function eof($mode = 0) {
         switch ($mode) {
             case 1:
@@ -37,13 +55,22 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
             case 0:
             default :
                 return feof($this->handle);
-        }     
+        }
     }
 
+    /**
+     * Read one char from the content
+     * @return char
+     */
     public function getc() {
         return fgetc($this->handle);
     }
 
+    /**
+     * Reads a line (\n) or a string up to the $length from the crontent
+     * @param int $length
+     * @return string
+     */
     public function gets($length = null) {
         if ($length) {
             return fgets($this->handle, $length);
@@ -52,6 +79,10 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
         }
     }
 
+    /**
+     * Returns the length of the content
+     * @return int
+     */
     public function length($safe = true) {
         if ($safe) {
             clearstatcache();
@@ -59,22 +90,39 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
         return fstat($this->handle)['size'];
     }
 
+    /**
+     * Read $length chars/bytes from the content
+     * @param int $length
+     * @return string
+     */
     public function read($length) {
-        if($length == 0){
+        if ($length == 0) {
             return "";
         }
         return fread($this->handle, $length);
     }
 
+    /**
+     * Seek to a position ($offset) in the content
+     * @param int $offset
+     * @param int $whence the mode of seeking (SEEK_, SEEK_CUR, SEEK_END)
+     * @return int
+     */
     public function seek($offset, $whence = SEEK_SET) {
         return fseek($this->handle, $offset, $whence);
     }
 
+    /**
+     * Clones the object. Needed to clone the handle.
+     */
     public function __clone() {
         $this->handle = FileHandleHelper::CLONE_HANDLE($this->handle);
         $this->closeFd = true;
     }
 
+    /**
+     * Destructs the object. Needed if $this->closeFd is set to true.
+     */
     public function __destruct() {
         if ($this->closeFd) {
             fclose($this->handle);

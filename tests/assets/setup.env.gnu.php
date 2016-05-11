@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 !(defined("ENV_NAME")) ? define("ENV_NAME", "env.gnu") : 0;
 $START_WDIR = getcwd();
 

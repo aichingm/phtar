@@ -5,30 +5,39 @@ namespace phtar\posix;
 /**
  * Description of LinuxFsEntry
  *
- * @author mario
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
 
+    /**
+     * Holds the type of the entry
+     * @var mixed
+     */
     protected $type;
 
-    public function __construct($filename) {
-        parent::__construct($filename);
+    /**
+     * Creates a new LinuxFsEntry object
+     * @param string $filename
+     * @param string $linkname
+     */
+    public function __construct($filename, $linkname = "") {
+        parent::__construct($filename, $linkname);
     }
 
+    /**
+     * Returns the name
+     * @return string
+     * @throws \InvalidArgumentException
+     */
     public function getName() {
-        if (strlen($this->filename) > 255) {
-            throw new \InvalidArgumentException("filename is too long");
-        }
-
         $name = PrimitiveEntry::splitName($this->filename)[1];
-
-        if (strlen($name) > 99) {
-            throw new \InvalidArgumentException("filename is too long");
-        }
-
         return $name;
     }
 
+    /**
+     * Returns the Device Major Number
+     * @return string Device Major Number
+     */
     public function getDevMajor() {
         if ($this->getType() == Archive::ENTRY_TYPE_BLOCK_DEV_NODE || $this->getType() === Archive::ENTRY_TYPE_CHAR_DEV_NODE) {
             return \phtar\utils\LinuxFileHelper::MAJOR_MINOR($this->filename)[0];
@@ -36,6 +45,10 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         return 0;
     }
 
+    /**
+     * Returns the Device Minor Number
+     * @return string Device Minor Number
+     */
     public function getDevMinor() {
         if ($this->getType() == Archive::ENTRY_TYPE_BLOCK_DEV_NODE || $this->getType() === Archive::ENTRY_TYPE_CHAR_DEV_NODE) {
             return \phtar\utils\LinuxFileHelper::MAJOR_MINOR($this->filename)[1];
@@ -43,25 +56,37 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         return 0;
     }
 
+    /**
+     * Returns the group name
+     * @return string group name
+     */
     public function getGroupName() {
         return posix_getgrgid($this->getGroupId())['name'];
     }
 
+    /**
+     * Returns the prefix
+     * @return string Device Minor Number
+     */
     public function getPrefix() {
-        $prefix = PrimitiveEntry::splitName($this->filename)[0];
-        if (strlen($prefix) > 154) {
-            throw new \InvalidArgumentException("filename is too long");
-        }
-        return $prefix;
+        return PrimitiveEntry::splitName($this->filename)[0];
     }
 
+    /**
+     * Returns the user name
+     * @return string user name
+     */
     public function getUserName() {
         return posix_getpwuid($this->getUserId())['name'];
     }
 
-    public function investigateType() {
+    /**
+     * Investigates the type of the entry
+     * @return mixed
+     */
+    protected function investigateType() {
         $type = filetype($this->filename);
-        if (parent::getType() === '1') {
+        if (parent::getType() === \phtar\v7\Archive::ENTRY_TYPE_HARDLINK) {
             $type = 'hardlink';
         }
         switch ($type) {
@@ -80,6 +105,10 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         }
     }
 
+    /**
+     * Returns the type of the entry (cached version of LinuxFsEntry::investigateType())
+     * @return mixed
+     */
     public function getType() {
         if ($this->type === null) {
             $this->type = $this->investigateType();
@@ -87,5 +116,4 @@ class LinuxFsEntry extends \phtar\v7\LinuxFsEntry implements Entry {
         return $this->type;
     }
 
-   
 }

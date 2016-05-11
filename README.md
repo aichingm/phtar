@@ -1,37 +1,54 @@
-phtar
-=====
+#phtar#
 
-A php implementation of the tar file archive.
 
-Todo:
-------
+A implementation of the tar file archive (v7, posix(ustar), gnutar) written in php.
 
-1. Posix-tar windows paths (change the \ to a / and remove c: )
-3. gnu old tar windows paths (change the \ to a / and remove c: )
-5. create an extractor
+##Current Status##
+This is a release candidate.
 
-Info and Links:
--------
-* http://www.freebsd.org/cgi/man.cgi?query=tar&sektion=5
-* http://en.wikipedia.org/wiki/Tar_(computing)
-* http://de.wikipedia.org/wiki/Tar
-* https://www.gnu.org/software/tar/manual/tar.html#SEC170
-* http://www.gnu.org/software/tar/manual/html_section/Formats.html
-* https://github.com/libarchive/libarchive/wiki/FormatTar
-* https://github.com/libarchive/libarchive/wiki/ManPageTar5
-* http://de.wikipedia.org/wiki/Pax_(Unix)
-* https://wiki.archlinux.org/index.php/sparse_file#Archiving_with_.60tar.27
 
-Devmajor & Devminor
--------------------
+##How To##
+For now there is no better documentation then the tests in `tests/`.
 
-* http://www.makelinux.net/ldd3/chp-3-sect-2
+###Read An Archive###
 
-Version 2
-=========
+__todo__
 
-Todo
-----
+###Write An Archive###
 
-* char device support in the posixUs format
-* block device support in the posixUs format
+__todo__
+
+
+
+##Tests##
+
+Run the test:
+
+__Note:__ You will need the Pest to run the test. Get your copy at https://github.com/aichingm/Pest
+
+    php path/to/Pest.php tests/
+
+This will run all tests. To check which failed use:
+
+    php path/to/Pest.php tests/ --pest_only_failed
+
+##License##
+
+GNU GENERAL PUBLIC LICENSE Version 3. See the `LICENSE` file in the repos root.
+
+---
+Copyright (C) 2016  Mario Aichinger
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+

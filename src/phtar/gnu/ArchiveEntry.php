@@ -4,8 +4,8 @@ namespace phtar\gnu;
 
 /**
  * Description of ArchiveEntry
- *
- * @author Mario Aichinger
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
 
@@ -121,7 +121,7 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
     }
 
     /**
-     * Returns the last time the file was accessed.
+     * Returns the last time the file was accessed as timestamp.
      * @return int
      */
     public function getATime() {
@@ -130,7 +130,7 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
     }
 
     /**
-     * Returns the last time the file or the inode was changed.
+     * Returns the last time the file or the inode was changed as timestamp.
      * @return int
      */
     public function getCTime() {
@@ -181,7 +181,7 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
         return $this->handle->read(1) != "\0";
     }
 
-    /**
+   /**
      * Returns the file's complete size. (Check the 'M'-type)
      * @return int 
      */

@@ -4,8 +4,8 @@ namespace phtar\gnu;
 
 /**
  * Description of Archive
- *
- * @author Mario Aichinger
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class Archive extends \phtar\v7\Archive {
 

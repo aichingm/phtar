@@ -4,8 +4,8 @@ namespace phtar\gnu;
 
 /**
  * Description of BaseEntry
- *
- * @author Mario Aichinger
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class BaseEntry extends PrimitiveEntry {
 

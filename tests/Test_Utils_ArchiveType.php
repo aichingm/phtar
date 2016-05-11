@@ -1,8 +1,14 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
+
 use phtar\utils\ArchiveType;
 
 $t->test("Test v7 archives", function() use($t, $databox) {
@@ -58,7 +64,6 @@ $t->test("Test onlyContains", function() use($t, $databox) {
     $t->assertTrue(ArchiveType::onlyContains(str_repeat(" ", 7), " "));
     $t->assertFalse(ArchiveType::onlyContains("This is a test", " "));
     $t->assertFalse(ArchiveType::onlyContains("      \0", " "));
-   
 });
 
 $t->run();

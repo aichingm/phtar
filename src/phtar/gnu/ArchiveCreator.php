@@ -4,31 +4,31 @@ namespace phtar\gnu;
 
 /**
  * Description of ArchiveCreator
- *
- * @author Mario Aichinger
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class ArchiveCreator implements \Countable {
 
     /**
-     *
-     * @var array 
+     * A list of entries which will be written to the archive file
+     * @var array
      */
     private $entries = array();
 
     /**
-     *
-     * @var \phtar\utils\FileFunctions 
+     * Holds a reference to the handle to which the archive will be written
+     * @var \phtar\utils\WriteFileFunctions 
      */
     private $handle;
 
     /**
-     *
-     * @var int
+     * Internal pointer to the start of the entry which is currently written
+     * @var int 
      */
     private $currFileStart = 0;
 
     /**
-     *
+     * Internal pointer to the end of the entry which is currently written
      * @var int 
      */
     private $currFileEnd = 0;
@@ -138,7 +138,7 @@ class ArchiveCreator implements \Countable {
     }
 
     /**
-     * Write the name to the handle
+     * Writes the name to the handle
      * @param \phtar\gnu\Entry $entry
      */
     protected function writeName(Entry $entry) {
@@ -188,8 +188,8 @@ class ArchiveCreator implements \Countable {
     }
 
     /**
-     * Write the time of the last modification to the handle
-     * @param \phtar\gnu\Entry $entry
+     * Write the last modification timestamp to the handle
+     * @param \phtar\v7\Entry $entry
      */
     protected function writeMTime(Entry $entry) {
         $mTime = str_pad(decoct($entry->getMTime()) . " ", 12, '0', STR_PAD_LEFT);
@@ -412,7 +412,7 @@ class ArchiveCreator implements \Countable {
 
     /**
      * Move around in the current entry's header/file space
-     * @param type $offset
+     * @param int $offset
      */
     private function seek($offset) {
         $this->handle->seek($this->currFileStart + $offset);

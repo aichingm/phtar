@@ -2,24 +2,18 @@
 
 namespace phtar\posix;
 
+/**
+ * Description of ArchiveEntry
+ *
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
 
-    /*public function getName() {
-        $this->handle->seek(0);
-        $name = $this->handle->read(100);
-        if (strpos($name, "\0") === FALSE) {
-            $this->handle->seek(345);
-            $prefix = $this->handle->read(155);
-            if (strpos($name, "\0") === FALSE) {
-                return $name . $prefix;
-            }
-            return $name . strstr($prefix, "\0", true);
-        } else {
-            return strstr($name, "\0", true);
-        }
-    }
-    */
-    
+    /**
+     * Returns the name
+     * @overrides \phtar\v7\ArchiveEntry::getName()
+     * @return string
+     */
     public function getName() {
         $name = parent::getName();
         $this->handle->seek(345);
@@ -36,11 +30,10 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
             return $name;
         }
     }
-    
 
     /**
-     * 
-     * @overrides \phtar\v7\ArchiveEntry::getType();
+     * Returns the type
+     * @overrides \phtar\v7\ArchiveEntry::getType()
      * @return int
      * @throws UnexpectedValueException
      */
@@ -58,24 +51,53 @@ class ArchiveEntry extends \phtar\v7\ArchiveEntry implements Entry {
         }
     }
 
+    /**
+     * Returns the Device Major Number
+     * @return int
+     */
     public function getDevMajor() {
         $this->handle->seek(329);
         return intval($this->handle->read(8), 8);
     }
 
+    /**
+     * Returns the Device Minor Number
+     * @return int
+     */
     public function getDevMinor() {
         $this->handle->seek(337);
         return intval($this->handle->read(8), 8);
     }
 
+    /**
+     * Returns the group name
+     * @return int
+     */
     public function getGroupName() {
         $this->handle->seek(297);
         return strstr($this->handle->read(32), "\0", true);
     }
 
+    /**
+     * Returns the user name
+     * @return int
+     */
     public function getUserName() {
         $this->handle->seek(265);
         return strstr($this->handle->read(32), "\0", true);
+    }
+    /**
+     * Returns the prefix
+     * @return string
+     */
+    public function getPrefix() {
+        $this->handle->seek(345);
+        $prefix = $this->handle->read(155);
+
+        if (strpos($prefix, "\0") === FALSE) {
+            return $prefix;
+        }
+        return strstr($prefix, "\0", true);
     }
 
 }

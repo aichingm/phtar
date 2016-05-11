@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 use \Pest\Utils;
 use \phtar\posix\Archive;
 use \phtar\utils\FileHandle;

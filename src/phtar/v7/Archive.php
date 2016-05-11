@@ -4,6 +4,7 @@ namespace phtar\v7;
 
 /**
  * Description of Archive
+ * 
  * @author Mario Aichinger <aichingm@gmail.com>
  */
 class Archive implements \Iterator {

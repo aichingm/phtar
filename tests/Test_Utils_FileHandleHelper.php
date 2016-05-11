@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
@@ -37,7 +42,7 @@ $t->test("Test FileHandleHelper::CLONE_HANDLE", function() use($t, $databox) {
     $t->assertEquals(ftell($handle), 15);
     $t->assertEquals(ftell($handleCopy), 0);
     $t->assertEquals(fgets($handleCopy), "This is a test\n");
-    
+
     //close the handles 
     fclose($handle);
     fclose($handleCopy);

@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 use \Pest\Utils;
 use \phtar\utils\FileHandle;
 
@@ -71,8 +76,8 @@ $t->test('Test too long file names', function() use($t, $databox) {
         $ac->add($entry1 = new \phtar\posix\BaseEntry("this_file_name_is_too_long_to_be_stored_in_a_po_tar_file_file_name_field_but_just_for_testing.file.txt", "some content"));
         $ac->write();
         fclose($fHandle);
-    }, phtar\utils\TarException::class);
-    
+    }, phtar\utils\PhtarException::class);
+
     $t->noException(function()use($filename) {
         file_put_contents($filename, "");
         $ac = new phtar\posix\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "r+")));
@@ -80,9 +85,9 @@ $t->test('Test too long file names', function() use($t, $databox) {
         $ac->write();
         fclose($fHandle);
     });
-    
-    
-    
+
+
+
     Utils::RM_TMP_FILES();
 });
 

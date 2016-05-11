@@ -2,7 +2,7 @@
 
 /*
  * This file is part of: phtar
- * Copyright (C) 2014  Mario Aichinger
+ * Copyright (C) 2016  Mario Aichinger
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

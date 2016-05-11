@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
@@ -111,7 +116,6 @@ EOF;
 $t->test("Test VirtaulFileCursor with FileHandleReader no line break", function() use($t, $databox) {
     $testString = "Lorem ipsum dolor sit amet, consetetur sadipscin";
     #var_dump(strlen($testString));
-
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
     $handle = fopen($filename, "r+");
@@ -135,7 +139,6 @@ $t->test("Test VirtaulFileCursor with FileHandleReader no line break", function(
 $t->test("Test VirtaulFileCursor with FileHandleReader one line break", function() use($t, $databox) {
     $testString = "Lorem ipsum dolor sit ame\nt, consetetur sadipscin";
     #var_dump(strlen($testString));
-
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
     $handle = fopen($filename, "r+");
@@ -158,7 +161,6 @@ $t->test("Test VirtaulFileCursor with FileHandleReader one line break", function
 $t->test("Test VirtaulFileCursor with  FileHandleReader empty VitrualFileCursor", function() use($t, $databox) {
     $testString = "1234567890abc";
     #var_dump(strlen($testString));
-
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
     $handle = fopen($filename, "r+");
@@ -179,7 +181,6 @@ $t->test("Test VirtaulFileCursor with  FileHandleReader empty VitrualFileCursor"
 $t->test("Test VirtaulFileCursor with FileHandleReader  VitrualFileCursor", function() use($t, $databox) {
     $testString = "1234567890abc";
     #var_dump(strlen($testString));
-
     //create File
     $filename = tempnam(sys_get_temp_dir(), 'FileHandleReader');
     $handle = fopen($filename, "r+");

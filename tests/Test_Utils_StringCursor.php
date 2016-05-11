@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of Phtar
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
@@ -25,7 +30,7 @@ consequat, vel illum dolore eu f
 EOF;
 
 
-    
+
     //new StringCursor
     $reader = new StringCursor($testString);
     $t->assertFalse($reader->eof(StringCursor::EOF_MODE_EOF));
@@ -48,8 +53,6 @@ EOF;
     $t->assertEquals($reader->getc(), $newReader->getc());
     $t->assertEquals($newReader->seek(0), 0);
     $t->assertNotEquals($reader->getc(), $newReader->getc());
-
-
 });
 
 $t->run();

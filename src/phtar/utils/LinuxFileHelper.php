@@ -1,20 +1,20 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace phtar\utils;
 
 /**
  * Description of LinuxFileHelper
- *
- * @author mario
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class LinuxFileHelper {
 
+    /**
+     * Returns array with the size of two. [0 => <major>, 1 => <minor>]. This function will only work on UNIX systems
+     * @param string $filename the filename of which devmajor and dev minor should be evaluated
+     * @return array An array with the size of two. [0 => <major>, 1 => <minor>]
+     * @throws \Exception 
+     */
     public static function MAJOR_MINOR($filename) {
         $pathToExecutable = null;
         $return_var = -1;
@@ -28,7 +28,7 @@ class LinuxFileHelper {
             }
             return array(0, 0);
         }
-        throw new \Exception("Unable to execute the ls command. Are you on unix?");
+        throw new \Exception("Unable to execute the >ls< command. Are you on unix?");
     }
 
 }

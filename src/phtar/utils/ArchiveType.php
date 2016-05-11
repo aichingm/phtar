@@ -2,6 +2,11 @@
 
 namespace phtar\utils;
 
+/**
+ * Description of ArchiveType
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 class ArchiveType {
 
     const TYPE_V7 = 0;
@@ -10,6 +15,11 @@ class ArchiveType {
     const TYPE_POSIX_USTAR = 2; # IEEE Std 1003.1-1988 (``POSIX.1'')
     const TYPE_PAX = 3;
 
+    /**
+     * Returns the type of the archive.
+     * @param \phtar\utils\ReadFileFunctions $tarEntry
+     * @return mixed
+     */
     public static function entryType(\phtar\utils\ReadFileFunctions $tarEntry) {
         $tarEntry->seek(257);
         $magicVersion = $tarEntry->read(8);
@@ -27,8 +37,18 @@ class ArchiveType {
         }
     }
 
+    /**
+     * Tests if the given string only conrains characters equal to $char
+     * @param string $str
+     * @param char $char
+     * @return type
+     */
     public static function onlyContains($str, $char) {
+        if (strlen($char) != 1) {
+            throw new \UnexpectedValueException("\$char needs to be a string only one character long");
+        }
         $strInfo = count_chars($str, 3);
         return strlen($strInfo) == 1 && $strInfo == $char;
     }
-}   
+
+}

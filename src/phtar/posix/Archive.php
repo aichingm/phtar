@@ -2,6 +2,11 @@
 
 namespace phtar\posix;
 
+/**
+ * Description of Archive
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
+ */
 class Archive extends \phtar\v7\Archive {
 
     const ENTRY_TYPE_FILE = 0;
@@ -16,7 +21,12 @@ class Archive extends \phtar\v7\Archive {
      * current file funcitons
      */
 
-    public function getName() {
+    /**
+     * Returns the name of the current entry     
+     * * @Overrides \phtar\v7\Archive::getName()
+     * @return string
+     */
+    protected function getName() {
         $name = parent::getName();
 
         $this->handle->seek($this->filePointer + 345);
@@ -34,7 +44,12 @@ class Archive extends \phtar\v7\Archive {
         }
     }
 
-    public function getType() {
+    /**
+     * Returns the type of the current entry
+     * @Overrides \phtar\v7\Archive::getType()
+     * @return mixed
+     */
+    protected function getType() {
         $this->handle->seek($this->filePointer + 156);
         $type = intval($this->handle->getc(), 10);
         /* $name = $this->getName();
@@ -47,7 +62,15 @@ class Archive extends \phtar\v7\Archive {
             throw new UnexpectedValueException("A valid type was expected");
         }
     }
-    public function createArchiveEntry($headerHandlePrototype, $contentHandlePrototype) {
+
+    /**
+     * Override this function to create a new Entry object
+     * @Overrides \phtar\v7\Archive::createArchiveEntry()
+     * @param \phtar\utils\ReadFileFunctions $headerHandlePrototype
+     * @param \phtar\utils\ReadFileFunctions $contentHandlePrototype
+     * @return \phtar\posix\ArchiveEntry
+     */
+    protected function createArchiveEntry($headerHandlePrototype, $contentHandlePrototype) {
         return new \phtar\posix\ArchiveEntry($headerHandlePrototype, $contentHandlePrototype);
     }
 

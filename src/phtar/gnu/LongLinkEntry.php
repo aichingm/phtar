@@ -4,8 +4,8 @@ namespace phtar\gnu;
 
 /**
  * Description of LongLinkEntry
- *
- * @author Mario Aichigner
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class LongLinkEntry extends PrimitiveEntry {
 

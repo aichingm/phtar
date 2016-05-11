@@ -4,30 +4,48 @@ namespace phtar\v7;
 
 /**
  * Description of LinuxFsEntry
- *
- * @author mario
+ * 
+ * @author Mario Aichinger <aichingm@gmail.com>
  */
 class LinuxFsEntry implements Entry {
 
-    protected static $USED_NODES = array();
+    /**
+     * Holds the name/path of the file 
+     * @var string 
+     */
     protected $filename = "";
 
-    public function __construct($filename) {
-        if ((!is_file($filename) && !is_dir($filename)) || !is_readable($filename)) {
+    /**
+     * Holds the nasme of the file to which this file is a link. Note if this is not set to "" (empty string) getType() will return 1
+     * @var string 
+     */
+    protected $linkname = "";
+
+    /**
+     * Creats a new LinuxFsEntry object
+     * @param string $filename
+     * @param string $linkname
+     * @throws \UnexpectedValueException gets thrown if $filename is not a file (is_file) or if $filename is not readable (is_readable)
+     */
+    public function __construct($filename, $linkname = "") {
+        if (!is_file($filename) || !is_readable($filename)) {
             throw new \UnexpectedValueException("readable file expected");
         }
 
         if (is_dir($filename) && $filename{strlen($filename) - 1} != "/") {
             $filename .= "/";
         }
-        $inode = fileinode($filename);
-        if (!isset(self::$USED_NODES[$inode])) {
-            self::$USED_NODES[$inode] = $filename;
-        }
 
         $this->filename = $filename;
+        $this->linkname = $linkname;
     }
 
+    /**
+     * Copys this content to another \phtar\utils\WriteFileFunctions object. Returns the number of bytes copyed this way. 
+     * @param \phtar\utils\WriteFileFunctions $destHandle 
+     * @param int $bufferSize copys cunks of $bufferSize 
+     * @return int 
+     */
     public function copy2handle(\phtar\utils\WriteFileFunctions $destHandle, $bufferSize = 8) {
         if (is_file($this->filename)) {
             return \phtar\utils\FileHandleHelper::COPY_H2H(new \phtar\utils\FileHandleReader(fopen($this->filename, "r")), $destHandle, $bufferSize);
@@ -36,34 +54,50 @@ class LinuxFsEntry implements Entry {
         }
     }
 
+    /**
+     * Returns the  group id
+     * @return int
+     */
     public function getGroupId() {
         return filegroup($this->filename);
     }
 
+    /**
+     * Returns the linkname
+     * @return string
+     */
     public function getLinkname() {
-        $inode = fileinode($this->filename);
-        if (isset(self::$USED_NODES[$inode]) && self::$USED_NODES[$inode] != $this->filename) {
-            return self::$USED_NODES[$inode];
-        }
-        return "";
+        return $this->linkname;
     }
 
+    /**
+     * Returns the  last modification time
+     * @return int
+     */
     public function getMTime() {
         return filemtime($this->filename);
     }
 
+    /**
+     * Returns the  mode
+     * @return int
+     */
     public function getMode() {
         return substr(sprintf('%o', fileperms($this->filename)), -4);
     }
 
+    /**
+     * Returns the name
+     * @return string
+     */
     public function getName() {
-        if (strlen($this->filename) > 99) {
-            throw new \InvalidArgumentException("file name is too long");
-        }
-
         return $this->filename;
     }
 
+    /**
+     * Returns the size 
+     * @return int
+     */
     public function getSize() {
 
         if (is_file($this->filename)) {
@@ -73,11 +107,24 @@ class LinuxFsEntry implements Entry {
         }
     }
 
+    /**
+     * Returns the type
+     * @return mixed
+     */
     public function getType() {
-        $inode = fileinode($this->filename);
-        return isset(self::$USED_NODES[$inode]) && self::$USED_NODES[$inode] == $this->filename ? "0" : "1";
+        if (is_dir($this->filename)) {
+            return Archive::ENTRY_TYPE_DIRECTORY;
+        } elseif ($this->linkname !== "") {
+            return Archive::ENTRY_TYPE_HARDLINK;
+        } else {
+            return Archive::ENTRY_TYPE_FILE;
+        }
     }
 
+    /**
+     * Returns the user id
+     * @return int
+     */
     public function getUserId() {
         return fileowner($this->filename);
     }
