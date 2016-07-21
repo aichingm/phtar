@@ -36,6 +36,7 @@ EOF;
     fseek($handle, 0);
     //new FileHandleWriter
     $writer = new FileHandleWriter($handle);
+    $t->assertSame($writer->getMode(), 'r+');
     $t->assertEquals($writer->write($testString), strlen($testString));
     $t->assertTrue($writer->flush());
     $t->assertEquals(file_get_contents($filename), $testString);
@@ -45,6 +46,7 @@ EOF;
     $t->assertEquals(fread($handle, 5), "testm");
 
     $newWriter = clone $writer;
+    $t->assertSame($newWriter->getMode(), 'r+');
     $t->assertEquals($newWriter->seek(0), 0);
     $t->assertEquals($writer->seek(1), 0);
     $t->assertEquals($newWriter->write("A"), 1);

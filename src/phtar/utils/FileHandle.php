@@ -28,4 +28,12 @@ class FileHandle extends FileHandleReader implements FileFunctions {
         return fwrite($this->handle, $string);
     }
 
+    /**
+     * Returns the type of access (how the stream can be accessed). See Table 1 of the fopen() reference.
+     * @return string
+     */
+    public function getMode() {
+        return stream_get_meta_data($this->handle)['mode'];
+    }
+
 }

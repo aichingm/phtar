@@ -12,6 +12,23 @@ $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
 
+$t->test('Test the phtar\gnu\ArchiveCreator::__construct() method', function() use($t, $databox) {
+
+    $t->expectException(function() {
+        $filename = Utils::TMP_FILE("Tar");
+        $ac = new phtar\gnu\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "r")));
+    }, \phtar\utils\PhtarException::class);
+
+    $t->expectException(function() {
+        $filename = Utils::TMP_FILE("Tar");
+        $ac = new phtar\gnu\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "a+")));
+    }, \phtar\utils\PhtarException::class);
+
+    $t->noException(function() {
+        $filename = Utils::TMP_FILE("Tar");
+        $ac = new phtar\gnu\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "r+")));
+    });
+});
 
 $t->test('Test the phtar\gnu\ArchiveCreator', function() use($t, $databox) {
     $filename = Utils::TMP_FILE("Tar");
@@ -60,7 +77,8 @@ $t->test('Test the phtar\gnu\ArchiveCreator', function() use($t, $databox) {
     $ac->write();
 
     $t->assertSame(filesize($filename), 512 * 4 + 512 + 512 + 3072 + 512 + 3072 + 512 + 6 * 2048 + 512 + 15 * 2048 + 512 * 2);
-
+    exec("file $filename", $output);
+    $t->assertSame($output[0], "$filename: POSIX tar archive (GNU)");
 
     fclose($fHandle);
     Utils::RM_TMP_FILES();

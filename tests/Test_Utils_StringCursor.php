@@ -33,6 +33,7 @@ EOF;
 
     //new StringCursor
     $reader = new StringCursor($testString);
+    $t->assertSame($reader->getMode(), 'r');
     $t->assertFalse($reader->eof(StringCursor::EOF_MODE_EOF));
     $t->assertEquals($reader->length(), strlen($testString));
     $t->assertEquals($reader->getc(), 'L');

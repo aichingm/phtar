@@ -187,4 +187,12 @@ class VirtualFileCursor implements ReadFileFunctions {
         $this->handle = clone $this->handle;
     }
 
+    /**
+     * Returns the type of access (how the stream can be accessed). See Table 1 of the fopen() reference.
+     * @return string
+     */
+    public function getMode() {
+        return 'r';
+    }
+
 }

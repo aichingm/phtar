@@ -30,6 +30,8 @@ $t->test("Test FileHandle", function() use($t, $databox) {
     clearstatcache();
     //test the new file size
     $t->assertEquals(filesize($filename), $filesize + 14);
+    //test the mode
+    $t->assertEquals($handle->getMode(), 'r+');
     //close the resource
     fclose($fHandle);
     //remove the tmp file

@@ -37,6 +37,7 @@ EOF;
     fseek($handle, 0);
     //new FileHandleReader
     $reader = new FileHandleReader($handle);
+    $t->assertSame($reader->getMode(), 'r+');
     $t->assertFalse($reader->eof(FileHandleReader::EOF_MODE_EOF));
     $t->assertEquals($reader->length(), strlen($testString));
     $t->assertEquals($reader->getc(), 'L');

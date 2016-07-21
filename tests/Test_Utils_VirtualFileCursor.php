@@ -39,6 +39,7 @@ EOF;
     fseek($handle, 0);
     //new FileHandleReader
     $file = new FileHandleReader($handle);
+    $t->assertSame($file->getMode(), 'r+');
 
     //new VirtualFileCursor
     $reader = new VirtualFileCursor($file, 10, strlen($testString) - 20);
@@ -54,6 +55,8 @@ EOF;
     $t->assertTrue($reader->eof(StringCursor::EOF_MODE_LENGTH));
     $t->assertTrue($reader->eof(StringCursor::EOF_MODE_TRY_READ));
     $t->assertTrue($reader->eof(StringCursor::EOF_MODE_EOF));
+    $t->assertSame($reader->getMode(), 'r');
+
 
     $newReader = clone $reader;
     $t->assertEquals($reader->seek(0), 0);
@@ -61,6 +64,7 @@ EOF;
     $t->assertEquals($reader->getc(), $newReader->getc());
     $t->assertEquals($newReader->seek(0), 0);
     $t->assertNotEquals($reader->getc(), $newReader->getc());
+    $t->assertSame($newReader->getMode(), 'r');
 
     fclose($handle);
     unlink($filename);

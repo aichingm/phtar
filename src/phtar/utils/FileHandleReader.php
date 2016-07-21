@@ -129,4 +129,12 @@ class FileHandleReader implements \phtar\utils\ReadFileFunctions {
         }
     }
 
+    /**
+     * Returns the type of access (how the stream can be accessed). See Table 1 of the fopen() reference.
+     * @return string
+     */
+    public function getMode() {
+        return stream_get_meta_data($this->handle)['mode'];
+    }
+
 }

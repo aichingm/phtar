@@ -28,4 +28,10 @@ interface WriteFileFunctions {
      * @return int
      */
     public function seek($offset, $whence = SEEK_SET);
+
+    /**
+     * Returns the type of access (how the stream can be accessed). See Table 1 of the fopen() reference.
+     * @return string
+     */
+    public function getMode();
 }

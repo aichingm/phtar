@@ -36,8 +36,12 @@ class ArchiveCreator implements \phtar\ArchiveCreator {
     /**
      * Create a new ArchiveCreator object
      * @param \phtar\utils\FileFunctions $handle
+     * @throws \phtar\utils\PhtarException if the handle was not opened with the mode r+
      */
     public function __construct(\phtar\utils\FileFunctions $handle) {
+        if ($handle->getMode() != 'r+') {
+            throw new \phtar\utils\PhtarException("The given handle is not opened with the mode 'r+'");
+        }
         $this->handle = $handle;
     }
 

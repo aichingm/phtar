@@ -15,10 +15,12 @@ $t->test("Test FileHandleHelper::COPY_H2H", function() use($t, $databox) {
     //source handle
     $sfHandle = fopen(__FILE__, "r");
     $sourceHandle = new phtar\utils\FileHandle($sfHandle);
+    $t->assertSame($sourceHandle->getMode(), 'r');
     //destination handle
     $filename = tempnam(sys_get_temp_dir(), 'COPY_H2H');
     $dfHandle = fopen($filename, "r+");
     $destHandle = new phtar\utils\FileHandle($dfHandle);
+    $t->assertSame($destHandle->getMode(), 'r+');
     //file size
     $filesize = filesize(__FILE__);
     //test the copy function

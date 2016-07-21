@@ -12,6 +12,24 @@ $t = new Pest\Pest(substr(basename(__FILE__), 0, -4));
 $databox = new stdClass();
 require_once __DIR__ . '/../src/Autoload.php';
 
+$t->test('Test the phtar\v7\ArchiveCreator::__construct() method', function() use($t, $databox) {
+
+    $t->expectException(function() {
+        $filename = Utils::TMP_FILE("Tar");
+        $ac = new phtar\v7\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "r")));
+    }, \phtar\utils\PhtarException::class);
+
+    $t->expectException(function() {
+        $filename = Utils::TMP_FILE("Tar");
+        $ac = new phtar\v7\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "a+")));
+    }, \phtar\utils\PhtarException::class);
+
+    $t->noException(function() {
+        $filename = Utils::TMP_FILE("Tar");
+        $ac = new phtar\v7\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "r+")));
+    });
+});
+
 
 $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
     $filename = Utils::TMP_FILE("Tar");
@@ -50,7 +68,7 @@ $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
 
 $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
     $filename = Utils::TMP_FILE("Tar");
-    #file_put_contents($filename, "");
+    file_put_contents($filename, "");
     $ac = new phtar\v7\ArchiveCreator(new FileHandle($fHandle = fopen($filename, "r+")));
     $ac->addWithParentDirectories($entry1 = new \phtar\v7\DirectoryEntry("Austria/Styria/Graz"));
     $ac->add($entry2 = new \phtar\v7\DirectoryEntry("Itali"));
@@ -64,6 +82,8 @@ $t->test('Test the phtar\v7\ArchiveCreator', function() use($t, $databox) {
 
     $t->assertSame(filesize($filename), 512 * 4 + 512 + 512 + 3072 + 512 + 3072 + 512 + 6 * 2048 + 512 + 15 * 2048 + 512 * 2);
 
+    exec("file $filename", $output);
+    $t->assertSame($output[0], "$filename: tar archive");
 
     fclose($fHandle);
     Utils::RM_TMP_FILES();
@@ -86,7 +106,6 @@ $t->test('Test too long file names', function() use($t, $databox) {
         $ac->write();
         fclose($fHandle);
     });
-
 
 
     Utils::RM_TMP_FILES();
