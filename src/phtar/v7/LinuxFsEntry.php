@@ -35,8 +35,12 @@ class LinuxFsEntry extends PrimitiveEntry {
         $this->filename = $filename;
         $this->setName($filename);
         $this->setType($this->investigateType());
-        $this->setSize(0);
-        $this->setMode(substr(sprintf('%o', fileperms($this->filename)), -4));
+        if(is_file($this->filename)){
+            $this->setSize(filesize($this->filename));
+        }else{
+            $this->setSize(0);
+        }
+        $this->setMode(octdec(substr(sprintf('%o', fileperms($this->filename)), -4)));
         $this->setLinkname($linkname);
         $this->setMTime(filemtime($this->filename));
         $this->setUserId(fileowner($this->filename));

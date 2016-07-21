@@ -7,7 +7,7 @@ namespace phtar\v7;
  * 
  * @author Mario Aichinger <aichingm@gmail.com>
  */
-class ArchiveCreator implements \Countable {
+class ArchiveCreator implements \phtar\ArchiveCreator {
 
     /**
      * A list of entries which will be written to the archive file
