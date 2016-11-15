@@ -25,19 +25,18 @@ class DirectoryArchiver {
     private $withoutRootDir = false;
 
     /**
-     * Holds a list of path names which sould get skiped during the directory archiving
-     * @var array 
+     * Holds a callable which is used as filter
+     * @var callable 
      */
-    private $skip = array();
+    private $filter = array();
 
     /**
      * Creates a new DirectoryArchiver object
      * @param \phtar\v7\ArchiveCreator $archiveCreator
      * @param string $directory
-     * @param array $skip
      * @throws \InvalidArgumentException if the ArchiveCreator is not of the class \phtar\v7\ArchiveCreator, \phtar\posix\ArchiveCreator or \phtar\gnu\ArchiveCreator
      */
-    public function __construct(\phtar\ArchiveCreator $archiveCreator, $directory, array $skip = array()) {
+    public function __construct(\phtar\ArchiveCreator $archiveCreator, $directory) {
 
         if (
                 !($archiveCreator instanceof \phtar\v7\ArchiveCreator ||
@@ -53,21 +52,21 @@ class DirectoryArchiver {
 
         $this->archiveCreator = $archiveCreator;
         $this->directory = realpath($directory) . "/";
-        $this->skip = $skip;
     }
 
     /**
-     * Set the list of path names which will be ignored while archiving the directory
-     * @param array $skip
+     * Set the callable which will be used as filter. The callable should return true or false.
+     * @param callable $filter
      * @return \phtar\utils\DirectoryArchiver
      */
-    public function setSkip(array $skip) {
-        $this->skip = $skip;
+    public function setSkip(callable $filter) {
+        $this->filter = $filter;
         return $this;
     }
 
     protected function shouldSkip($name) {
-        return in_array($name, $this->skip);
+        $f = $this->filter;
+        return $f($name);
     }
 
     /**
@@ -77,26 +76,28 @@ class DirectoryArchiver {
         $fsef = $this->getFsEntryFactory();
         $Directory = new \RecursiveDirectoryIterator($this->directory);
         $Iterator = new \RecursiveIteratorIterator($Directory);
-        
+
         if ($this->withoutRootDir) {
             $rootDir = "";
         } else {
             $rootDir = basename($this->directory) . "/";
         }
-        
+
         foreach ($Iterator as $filename => $name) {
             if (basename($name) === "..") {
                 continue;
             }
             if (basename($name) == ".") {
+                #for xx/yy/zz/. cut off the last dot
                 $name = substr($name, 0, -1);
             }
+
+            $name = substr($name, strlen($this->directory));
+
             if ($this->shouldSkip("./" . $rootDir . $name)) {
                 continue;
             }
 
-            $name = substr($name, strlen($this->directory));
-            
             $entry = $fsef->create($filename);
             $entry->setName("./" . $rootDir . $name);
             $this->archiveCreator->add($entry);
