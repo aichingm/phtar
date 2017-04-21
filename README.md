@@ -3,7 +3,7 @@ phtar
 
 An implementation of the tar file archive format (v7, posix(ustar), gnutar) written in php.
 
-###Read An Archive###
+### Read An Archive ###
 
 To read an archive from a file use this code:
 
@@ -24,7 +24,7 @@ __Note:__ `$archive` is of the type `phtar\v7\Archive`, `phtar\posix\Archive` or
 
 __Note:__ `$file` is of the type `phtar\v7\ArchiveEntry`, `phtar\posix\ArchiveEntry` or `phtar\gnu\ArchiveEntry` depending on the type of archive. Check this classes for more methods.
 
-###Write An Archive###
+### Write An Archive ###
 
 
     //open file handle
@@ -44,10 +44,10 @@ __Note:__ `$file` is of the type `phtar\v7\ArchiveEntry`, `phtar\posix\ArchiveEn
 
 __Note:__ When opening the file handle it is important to use `r+` as the mode.
 
-##How To##
+## How To ##
 For now there is no better documentation than the tests in `tests/`.
 
-##Tests##
+## Tests ##
 
 Run the test:
 
@@ -59,7 +59,7 @@ This will run all tests. To check which failed use:
 
     php path/to/Pest.php tests/ --pest_only_failed
 
-##License##
+## License ##
 
 GNU GENERAL PUBLIC LICENSE Version 3. See the `LICENSE` file in the repos root.
 
